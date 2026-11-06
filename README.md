@@ -3,8 +3,12 @@
 Widget Android (KWGT) di sola lettura sulla situazione meteo-idrologica di Fanano (MO):
 pioggia osservata, pioggia prevista, livelli dei torrenti Leo e Panaro, stato di allerta della zona E1.
 
-> Lavori in corso: per ora il repository contiene solo la configurazione delle stazioni e la
-> diagnostica di raggiungibilità degli endpoint Arpae (`python -m fanano.probe`, workflow `probe`).
+> Lavori in corso. Per ora il repository contiene:
+> - `config.yaml`: stazioni e parametri;
+> - `fanano/arpae.py`: download e parsing degli endpoint Arpae (`python -m fanano.arpae` stampa i valori
+>   estratti, `--save DIR` salva anche le risposte grezze);
+> - `fanano/probe.py`: diagnostica di raggiungibilità (`python -m fanano.probe`, workflow `probe`);
+> - `tests/`: test dei parser sulle risposte Arpae reali salvate in `tests/fixtures` (`python -m pytest`).
 
 ## Fonte dei dati
 
