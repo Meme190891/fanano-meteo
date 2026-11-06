@@ -1,10 +1,10 @@
 name: aggiorna
 
-# Ogni 30 minuti: scarica i dati Arpae, aggiorna lo storico e pubblica su GitHub Pages
+# Ogni 30 minuti (minuti 8 e 38): scarica i dati Arpae, aggiorna lo storico e pubblica su GitHub Pages
 # (branch gh-pages, un solo commit sovrascritto a ogni esecuzione: il repository non cresce).
 on:
   schedule:
-    - cron: "7,37 * * * *"   # minuti 7 e 37: evita i picchi di carico di :00 e :30
+    - cron: "8,38 * * * *"   # minuti 8 e 38: evita i picchi di carico di :00 e :30
     - cron: "23 3 * * 1"     # lunedi' 03:23 UTC: solo keepalive (vedi job sotto)
   workflow_dispatch:
     inputs:

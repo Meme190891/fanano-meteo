@@ -28,7 +28,7 @@ def formula_immagine(base_url: str) -> str:
     """URL dell'immagine: variante scura col tema scuro del telefono, parametro che cambia ogni 30'.
 
     Formula unica tra $...$ (come nei preset reali) con concatenazione "+" documentata da Kustom.
-    Il parametro t cambia alle :15 e :45, dopo le pubblicazioni delle :07 e :37: KWGT riscarica
+    Il parametro t cambia alle :15 e :45, dopo le pubblicazioni delle :08 e :38: KWGT riscarica
     l'immagine quando cambia l'URL.
     """
     return (f'$"{base_url.rstrip("/")}/widget" + if(si(darkmode) = 1, "_dark", "") + ".png?t=" + '

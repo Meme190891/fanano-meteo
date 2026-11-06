@@ -29,7 +29,7 @@ I file si aggiornano da soli ogni 30 minuti.
 ## Come funziona
 
 ```
-GitHub Actions (ogni 30', minuti 7 e 37)
+GitHub Actions (ogni 30', minuti 8 e 38)
   ├─ legge state.json dall'ultima pubblicazione (storico, ultimi dati validi)
   ├─ 8 richieste ad allertameteo.regione.emilia-romagna.it (una per endpoint)
   ├─ python -m fanano.main: storico, cumulate, tendenze, soglie, stato, grafici
@@ -215,7 +215,7 @@ I nomi delle voci di menu possono variare leggermente tra versioni e lingue dell
 KWGT riscarica un contenuto web quando cambia il suo URL: è il metodo indicato dalla
 [ricetta ufficiale](https://docs.kustom.rocks/categories/Web-Content/), che aggiunge un parametro
 `?refresh=` all'URL. Qui il parametro cambia ogni 30 minuti, alle :15 e alle :45, cioè dopo le pubblicazioni
-delle :07 e :37.
+delle :08 e :38.
 
 Nell'elemento radice → tab **Globals** → **+** → tipo **Text** → nome `url` → valore:
 
