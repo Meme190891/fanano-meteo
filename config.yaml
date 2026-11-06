@@ -1,0 +1,45 @@
+# Configurazione del widget meteo-idrologico di Fanano.
+# Si possono aggiungere o togliere stazioni senza toccare il codice.
+# ID e codici variabile sono quelli usati dal portale Allerta Meteo Emilia-Romagna (Arpae).
+
+arpae:
+  base_url: "https://allertameteo.regione.emilia-romagna.it"
+  user_agent: "fanano-meteo-widget/0.1 (+https://github.com/Meme190891/fanano-meteo)"
+  timeout_s: 20
+
+# Codici variabile Arpae (formato: timerange/livello/codice BUFR)
+variabili:
+  livello: "254,0,0/1,-,-,-/B13215"        # livello idrometrico istantaneo (m)
+  pioggia_oraria: "1,0,3600/1,-,-,-/B13011" # precipitazione cumulata su 1 ora (mm)
+
+# Zona di allertamento di Fanano (layer comuni del portale: FANANO -> E1)
+zona_allerta: "E1"
+
+# Provincia per la previsione ufficiale (pagina "Previsioni regionali" del portale)
+previsione:
+  provincia: "MO"
+  zona: "rilievi"   # colonna della tabella da usare: "rilievi" o "pianura"
+
+# Idrometri mostrati nel widget, nell'ordine delle righe
+torrenti:
+  - chiave: leo
+    nome: "Leo a Fanano"
+    id: "5503"
+    corso_acqua: "T. Leo"
+    pluviometri: [pratignano, scaffaiolo]
+  - chiave: panaro
+    nome: "Panaro a P.te Val di Sasso"
+    id: "5434"
+    corso_acqua: "F. Panaro"
+    pluviometri: [pratignano, scaffaiolo]
+
+nota_torrenti: "Ospitale e Fellicarolo: nessun idrometro Arpae"
+
+# Pluviometri per la pioggia osservata
+pluviometri:
+  - chiave: pratignano
+    nome: "Lago Pratignano"
+    id: "5501"
+  - chiave: scaffaiolo
+    nome: "Lago Scaffaiolo"
+    id: "12461"

@@ -1,0 +1,25 @@
+name: probe
+
+# Diagnostica: verifica che gli endpoint Arpae rispondano dai runner GitHub.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "fanano/probe.py"
+      - ".github/workflows/probe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m fanano.probe
