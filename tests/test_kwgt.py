@@ -13,10 +13,10 @@ from conftest import NOW
 def test_widget_png_chiaro_e_scuro(stato, cfg, tmp_path):
     w = compute.costruisci_widget(stato, cfg, NOW)
     files = widget_img.genera(w, cfg, tmp_path)
-    assert [f.name for f in files] == ["widget.png", "widget_dark.png"]
+    assert [f.name for f in files] == ["widget.png", "widget_dark.png", "widget43.png", "widget43_dark.png"]
     for f in files:
         im = Image.open(f)
-        assert im.size == (1200, 600) and im.mode == "RGBA"
+        assert im.size == ((1200, 900) if "43" in f.name else (1200, 600)) and im.mode == "RGBA"
         assert im.getpixel((0, 0))[3] == 0          # angolo trasparente (riquadro arrotondato)
         assert im.getpixel((600, 300))[3] > 200     # centro opaco
 
@@ -45,7 +45,7 @@ def test_preset_struttura(cfg, tmp_path):
     assert img["internal_type"] == "BitmapModule"
     assert img["internal_toggles"] == {"bitmap_bitmap": 10, "bitmap_width": 10}
     formula = img["internal_formulas"]["bitmap_bitmap"]
-    assert formula.startswith('$"https://meme190891.github.io/fanano-meteo/widget"') and formula.endswith("$")
+    assert formula.startswith('$"https://meme190891.github.io/fanano-meteo/widget43"') and formula.endswith("$")
     assert 'if(si(darkmode) = 1, "_dark", "")' in formula and "mu(floor, (df(S) - 900) / 1800)" in formula
     for ev in (root["internal_events"][0], img["internal_events"][0]):
         assert ev["action"] == "LAUNCH_ACTIVITY" and ev["type"] == "SINGLE_TAP"
@@ -59,8 +59,9 @@ def test_genera_tutto_include_widget_e_preset(stato, cfg, tmp_path):
     assert {"widget.png", "widget_dark.png", "Fanano_meteo.kwgt", "kwgt.html", "index.html"} <= nomi
     pagina = (tmp_path / "kwgt.html").read_text(encoding="utf-8")
     assert 'href="Fanano_meteo.kwgt" download' in pagina
-    assert "&quot;https://meme190891.github.io/fanano-meteo/widget&quot;" in pagina    # formula escapata
-    assert "$mu(min, si(rwidth), si(rheight) * 2)$" in pagina
+    assert "&quot;https://meme190891.github.io/fanano-meteo/widget43&quot;" in pagina    # formula escapata
+    assert "$mu(min, si(rwidth), si(rheight) * 4 / 3)$" in pagina
+    assert "Passa al formato 4×3" in pagina
     assert 'href="kwgt.html"' in (tmp_path / "index.html").read_text(encoding="utf-8")
 
 
@@ -73,3 +74,13 @@ def test_widget_png_con_grafici_pioggia(stato, cfg, tmp_path):
     for st in (stato, None):                     # con dati e senza (nessun dato): niente eccezioni
         f = widget_img.disegna(w, cfg, "chiaro", tmp_path / "g.png", st, NOW)
         assert Image.open(f).size == (1200, 600)
+
+
+def test_widget43_previsione_e_vuoto(stato, cfg, tmp_path):
+    w = compute.costruisci_widget(stato, cfg, NOW)
+    giorni = widget_img._giorni_previsione(stato, NOW)
+    assert giorni == [("oggi", 4.0, 5.0), ("domani", 0.0, 0.0), ("dom 8", 0.0, 0.0)]
+    assert widget_img._fmt_mm(4.0, 5.0) == "4-5" and widget_img._fmt_mm(0.0, 0.0) == "0"
+    for st in (stato, None):
+        f = widget_img.disegna43(w, cfg, "scuro", tmp_path / "w43.png", st, NOW)
+        assert Image.open(f).size == (1200, 900)

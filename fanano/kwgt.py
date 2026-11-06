@@ -24,14 +24,18 @@ NOME_FILE = "Fanano_meteo.kwgt"
 SET = 10
 
 
-def formula_immagine(base_url: str) -> str:
+IMMAGINE = "widget43"                                     # widget 4x3 (immagine 4:3)
+LARGHEZZA = "$mu(min, si(rwidth), si(rheight) * 4 / 3)$"   # tutta la larghezza senza uscire in altezza
+
+
+def formula_immagine(base_url: str, nome: str = IMMAGINE) -> str:
     """URL dell'immagine: variante scura col tema scuro del telefono, parametro che cambia ogni 30'.
 
     Formula unica tra $...$ (come nei preset reali) con concatenazione "+" documentata da Kustom.
     Il parametro t cambia alle :15 e :45, dopo le pubblicazioni delle :08 e :38: KWGT riscarica
     l'immagine quando cambia l'URL.
     """
-    return (f'$"{base_url.rstrip("/")}/widget" + if(si(darkmode) = 1, "_dark", "") + ".png?t=" + '
+    return (f'$"{base_url.rstrip("/")}/{nome}" + if(si(darkmode) = 1, "_dark", "") + ".png?t=" + '
             'mu(floor, (df(S) - 900) / 1800)$')
 
 
@@ -51,8 +55,7 @@ def preset_json(cfg: dict) -> dict:
         "internal_toggles": {"bitmap_bitmap": SET, "bitmap_width": SET},
         "internal_formulas": {
             "bitmap_bitmap": formula_immagine(base),
-            # tutta la larghezza, ma senza uscire in altezza (l'immagine e' 2:1)
-            "bitmap_width": "$mu(min, si(rwidth), si(rheight) * 2)$",
+            "bitmap_width": LARGHEZZA,
         },
         "bitmap_width": 300.0,
         "internal_events": [tocco],
@@ -65,7 +68,7 @@ def preset_json(cfg: dict) -> dict:
             "author": "fanano-meteo",
             "email": "",
             "width": 918,
-            "height": 542,
+            "height": 688,
             "features": "",
             "release": 377435216,
             "locked": False,

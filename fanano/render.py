@@ -406,7 +406,7 @@ def pagina_kwgt(cfg: dict, widget: dict, now: datetime) -> str:
     base = cfg["pubblicazione"]["base_url"].rstrip("/")
     versione = now.strftime("%Y%m%d%H%M")
     f_img = kwgt.formula_immagine(base)
-    f_larg = "$mu(min, si(rwidth), si(rheight) * 2)$"
+    f_larg = kwgt.LARGHEZZA
     pagina = f"{base}/index.html"
 
     def copia(id_: str, testo: str) -> str:
@@ -433,7 +433,19 @@ color:var(--ink);padding:0 12px}}
 <h1>Aggiungi il widget al telefono</h1>
 <p class="sub">Serve l'app <strong>KWGT</strong> (Play Store). Il widget è un'immagine che si aggiorna da sola
 ogni 30 minuti.</p>
-<img src="widget.png?v={versione}" width="1200" height="600" alt="Anteprima del widget: stato, livelli di Leo e Panaro, pioggia, previsione e allerta">
+<img src="widget43.png?v={versione}" width="1200" height="900" alt="Anteprima del widget: stato, pioggia ora per ora a Pratignano e Scaffaiolo, livelli di Leo e Panaro, pioggia prevista">
+
+<h2>Hai già il widget? Passa al formato 4×3</h2>
+<div class="card"><ol class="passi">
+<li>Sulla Home tieni premuto sul widget e trascina la maniglia in basso finché occupa <strong>3 righe</strong>.</li>
+<li>Tocca il widget per aprire KWGT → riga <strong>Immagine</strong> → tocca la riga <strong>Bitmap</strong>
+(è già una formula: si apre la casella di testo). Cancella tutto e incolla:
+{copia("n1", f_img)}</li>
+<li>Tocca la riga <strong>Larghezza</strong>, cancella tutto e incolla:
+{copia("n2", f_larg)}</li>
+<li>Tocca il <strong>dischetto</strong> per salvare.</li>
+</ol>
+<p class="nota">Finché non fai questi passi il widget continua a mostrare la versione precedente, senza problemi.</p></div>
 <div class="card"><p><strong>Hai KWGT gratuito?</strong> Usa il metodo 1: creare un widget da zero è gratis.
 <br><strong>Hai KWGT PRO?</strong> Puoi usare il metodo 2, più veloce: importare un widget già pronto è una
 funzione della versione PRO.</p></div>
@@ -441,7 +453,7 @@ funzione della versione PRO.</p></div>
 <h2>Metodo 1 · a mano, gratis (6 passi)</h2>
 <div class="card"><ol class="passi">
 <li>Sulla schermata Home tieni premuto su uno spazio vuoto → <strong>Widget</strong> → <strong>KWGT</strong> →
-trascina sulla Home il widget <strong>4×2</strong>. Poi tocca il widget: si apre KWGT.
+trascina sulla Home il widget <strong>4×3</strong>. Poi tocca il widget: si apre KWGT.
 Se propone dei widget pronti, scegli di crearne uno nuovo/vuoto.</li>
 <li>Tocca <strong>+</strong> in alto a destra e scegli <strong>Immagine</strong> (in inglese <em>Image</em>).</li>
 <li>Tocca la riga <strong>Immagine</strong> appena creata, poi la voce <strong>Bitmap</strong>.
@@ -459,7 +471,7 @@ azione <em>Open link</em> (Apri link) → incolla:
 <div class="card"><ol class="passi">
 <li><a class="btn" href="{kwgt.NOME_FILE}" download>Scarica il widget</a><br>
 <span class="nota">Il file <code>{kwgt.NOME_FILE}</code> finisce nella cartella <em>Download</em>.</span></li>
-<li>Aggiungi sulla Home un widget <strong>KWGT 4×2</strong> e toccalo (come al passo 1 del metodo 1).</li>
+<li>Aggiungi sulla Home un widget <strong>KWGT 4×3</strong> e toccalo (come al passo 1 del metodo 1).</li>
 <li>Tocca <strong>Load Preset</strong> (Carica preset) → icona della <strong>cartella</strong> in alto →
 <strong>Import</strong> → scegli <code>{kwgt.NOME_FILE}</code> dalla cartella <em>Download</em>.</li>
 <li>Tocca l'icona del <strong>dischetto</strong> in alto per salvare. Fatto.</li>

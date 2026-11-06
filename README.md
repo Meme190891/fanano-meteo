@@ -9,7 +9,7 @@ portale [Allerta Meteo Emilia-Romagna](https://allertameteo.regione.emilia-romag
 
 Per aggiungere il widget al telefono apri **https://meme190891.github.io/fanano-meteo/kwgt.html** dal telefono.
 
-![Widget](https://meme190891.github.io/fanano-meteo/widget.png)
+![Widget](https://meme190891.github.io/fanano-meteo/widget43.png)
 
 ## Indirizzi pubblici
 
@@ -17,7 +17,8 @@ Per aggiungere il widget al telefono apri **https://meme190891.github.io/fanano-
 |---|---|
 | **Istruzioni per aggiungere il widget (da aprire sul telefono)** | https://meme190891.github.io/fanano-meteo/kwgt.html |
 | Widget pronto per KWGT | https://meme190891.github.io/fanano-meteo/Fanano_meteo.kwgt |
-| Immagine del widget (tema chiaro / scuro) | `.../widget.png` · `.../widget_dark.png` |
+| Immagine del widget 4×3 (tema chiaro / scuro), quella in uso | `.../widget43.png` · `.../widget43_dark.png` |
+| Immagine del widget 4×2 (versione precedente, ancora aggiornata) | `.../widget.png` · `.../widget_dark.png` |
 | Dati per il widget | https://meme190891.github.io/fanano-meteo/widget.json |
 | Pagina con grafici e tabelle (da aprire toccando il widget) | https://meme190891.github.io/fanano-meteo/index.html |
 | Grafico Leo (tema chiaro / scuro) | `.../leo.png` · `.../leo_dark.png` |
@@ -176,10 +177,10 @@ Il widget è un'unica immagine (`widget.png`, o `widget_dark.png` con il tema sc
 30 minuti, quindi in KWGT non serve comporre testi e formule.
 
 - **Metodo 1, a mano (6 passi, funziona con KWGT gratuito):**
-  1. Aggiungi un widget KWGT 4×2 e toccalo.
+  1. Aggiungi un widget KWGT 4×3 e toccalo.
   2. **+** → **Immagine**.
   3. **Bitmap** → formula → incolla il testo indicato nella pagina.
-  4. **Larghezza** → formula → incolla `$mu(min, si(rwidth), si(rheight) * 2)$`.
+  4. **Larghezza** → formula → incolla `$mu(min, si(rwidth), si(rheight) * 4 / 3)$`.
   5. Facoltativo: tocco → *Open link* → `index.html`.
   6. Salva.
 
