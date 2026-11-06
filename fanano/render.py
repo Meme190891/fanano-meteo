@@ -496,7 +496,7 @@ function seleziona(id) {{
 def genera_tutto(st: dict, cfg: dict, widget: dict, now: datetime, out: Path) -> list[Path]:
     from fanano import kwgt, widget_img
     files = genera_grafici(st, cfg, widget, now, out)
-    files += widget_img.genera(widget, cfg, out)
+    files += widget_img.genera(widget, cfg, out, st, now)
     files.append(kwgt.genera(cfg, out, out / "widget.png"))
     for nome, contenuto in (("index.html", pagina_index(st, cfg, widget, now)),
                             ("kwgt.html", pagina_kwgt(cfg, widget, now))):

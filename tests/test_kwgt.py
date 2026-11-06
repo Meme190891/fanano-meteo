@@ -62,3 +62,14 @@ def test_genera_tutto_include_widget_e_preset(stato, cfg, tmp_path):
     assert "&quot;https://meme190891.github.io/fanano-meteo/widget&quot;" in pagina    # formula escapata
     assert "$mu(min, si(rwidth), si(rheight) * 2)$" in pagina
     assert 'href="kwgt.html"' in (tmp_path / "index.html").read_text(encoding="utf-8")
+
+
+def test_widget_png_con_grafici_pioggia(stato, cfg, tmp_path):
+    w = compute.costruisci_widget(stato, cfg, NOW)
+    ore = widget_img._pioggia_oraria(stato, "pratignano", NOW)
+    assert len(ore) == 24 and ore[-1] == 0.2 and ore[-2] == 1.8 and ore[-3] == 1.0
+    vuoto = widget_img._pioggia_oraria(None, "pratignano", NOW)
+    assert vuoto == [None] * 24
+    for st in (stato, None):                     # con dati e senza (nessun dato): niente eccezioni
+        f = widget_img.disegna(w, cfg, "chiaro", tmp_path / "g.png", st, NOW)
+        assert Image.open(f).size == (1200, 600)
