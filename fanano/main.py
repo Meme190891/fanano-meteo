@@ -113,9 +113,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--now", help="istante ISO da usare come 'adesso' (solo per prove offline)")
     ap.add_argument("--config", type=Path, help="config.yaml alternativo")
     ap.add_argument("--senza-grafici", action="store_true", help="non generare PNG e index.html")
+    ap.add_argument("--base-url", help="URL base Arpae alternativo (es. host inesistente per provare il fallback)")
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config) if args.config else load_config()
+    if args.base_url:
+        cfg["arpae"]["base_url"] = args.base_url
     now = datetime.fromisoformat(args.now) if args.now else datetime.now(UTC)
     if now.tzinfo is None:
         now = now.replace(tzinfo=UTC)

@@ -1,0 +1,87 @@
+name: aggiorna
+
+# Ogni 30 minuti: scarica i dati Arpae, aggiorna lo storico e pubblica su GitHub Pages
+# (branch gh-pages, un solo commit sovrascritto a ogni esecuzione: il repository non cresce).
+on:
+  schedule:
+    - cron: "7,37 * * * *"   # minuti 7 e 37: evita i picchi di carico di :00 e :30
+    - cron: "23 3 * * 1"     # lunedi' 03:23 UTC: solo keepalive (vedi job sotto)
+  workflow_dispatch:
+    inputs:
+      simula_arpae_giu:
+        description: "Prova il fallback: usa un host Arpae inesistente (i dati restano quelli dell'ultima esecuzione)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: aggiorna
+  cancel-in-progress: false
+
+jobs:
+  aggiorna:
+    if: github.event.schedule != '23 3 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write          # push sul branch gh-pages
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Recupera lo stato precedente da gh-pages
+        run: |
+          mkdir -p public
+          if git fetch --depth 1 origin gh-pages 2>/dev/null; then
+            git show FETCH_HEAD:state.json > public/state.json || rm -f public/state.json
+          fi
+          ls -la public
+
+      - name: Genera widget.json, grafici e pagina
+        env:
+          SIMULA: ${{ inputs.simula_arpae_giu && '--base-url https://arpae-non-raggiungibile.invalid' || '' }}
+        run: python -m fanano.main --out public $SIMULA > /dev/null
+
+      - name: Controlla l'output prima di pubblicare
+        run: |
+          python - <<'EOF'
+          import json, pathlib
+          w = json.loads(pathlib.Path("public/widget.json").read_text(encoding="utf-8"))
+          for k in ("aggiornato", "stato", "leo_livello", "disclaimer"):
+              assert k in w, k
+          print(f"{w['aggiornato']} | {w['stato']} | Leo {w['leo_livello']} ({w['leo_ora']}) | "
+                f"Panaro {w['panaro_livello']} | errori: {w['errori'] or '-'}")
+          EOF
+          cp DATA-LICENSE public/LICENZA-DATI.txt
+          touch public/.nojekyll
+
+      - name: Pubblica su gh-pages (commit orfano singolo)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd public
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "Dati del $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+
+  keepalive:
+    # GitHub disattiva i workflow pianificati dopo 60 giorni senza attivita' nel repository.
+    # I push su gh-pages dovrebbero gia' contare come attivita'; questa chiamata settimanale
+    # riabilita comunque il workflow (mitigazione, non garanzia: GitHub avvisa via email).
+    if: github.event.schedule == '23 3 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      actions: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/aggiorna.yml/enable" && echo "workflow abilitato"

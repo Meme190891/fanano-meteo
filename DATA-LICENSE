@@ -1,0 +1,15 @@
+Licenza dei dati pubblicati (widget.json, state.json, *.png, index.html)
+
+I dati provengono dal portale Allerta Meteo Emilia-Romagna
+(https://allertameteo.regione.emilia-romagna.it/), gestito da Arpae Emilia-Romagna -
+Servizio Idro-Meteo-Clima e dall'Agenzia per la sicurezza territoriale e la protezione
+civile - Emilia-Romagna, e sono rilasciati con licenza Creative Commons
+Attribuzione - Non commerciale - Condividi allo stesso modo 4.0 Internazionale
+(CC BY-NC-SA 4.0): https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+I file pubblicati sono una rielaborazione automatica di quei dati (cumulate, tendenze,
+confronto con le soglie, grafici) e sono distribuiti con la stessa licenza CC BY-NC-SA 4.0.
+Fonte: "Allerta Meteo Emilia-Romagna" - https://allertameteo.regione.emilia-romagna.it/
+
+Dati in tempo reale, non validati. Elaborazione non ufficiale per uso personale:
+per decisioni di sicurezza fare riferimento ai canali ufficiali.
