@@ -357,6 +357,7 @@ def pagina_index(st: dict, cfg: dict, widget: dict, now: datetime) -> str:
 <body><main>
 <h1>Fanano · torrenti e pioggia</h1>
 <p class="sub">Aggiornato {_e(w['aggiornato'])} · {_e(pub['disclaimer'])}</p>
+<p><a href="kwgt.html">📲 Aggiungi il widget al telefono</a></p>
 <div class="card"><div class="stato">{_dot(w['stato_colore'], 'dot')}<span>{_e(w['stato'])}</span></div>
 {f'<p class="sub">{_e(w["stato_dettaglio"])}</p>' if w.get('stato_dettaglio') else ''}
 {f'<p class="sub">Fonti non raggiunte in questo aggiornamento: {_e(w["errori"])}</p>' if w.get('errori') else ''}
@@ -399,8 +400,105 @@ Elaborazione non ufficiale per uso personale: per decisioni di sicurezza fare ri
 """
 
 
+def pagina_kwgt(cfg: dict, widget: dict, now: datetime) -> str:
+    """Istruzioni per aggiungere il widget al telefono, con pulsanti Copia (si apre dal telefono)."""
+    from fanano import kwgt
+    base = cfg["pubblicazione"]["base_url"].rstrip("/")
+    versione = now.strftime("%Y%m%d%H%M")
+    f_img = kwgt.formula_immagine(base)
+    f_larg = "$mu(min, si(rwidth), si(rheight) * 2)$"
+    pagina = f"{base}/index.html"
+
+    def copia(id_: str, testo: str) -> str:
+        return (f'<div class="copy"><code id="{id_}">{_e(testo)}</code>'
+                f'<button type="button" onclick="copia(\'{id_}\', this)">Copia</button></div>')
+
+    return f"""<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Widget Fanano</title>
+<meta name="description" content="Come aggiungere il widget meteo-idrologico di Fanano al telefono con KWGT">
+<style>{CSS}
+ol.passi{{padding-left:1.3em}} ol.passi li{{margin:.55rem 0}}
+.btn{{display:inline-block;background:var(--link);color:var(--surface);text-decoration:none;font-weight:700;
+padding:12px 18px;border-radius:10px;margin:.4rem 0}}
+.copy{{display:flex;gap:8px;align-items:stretch;margin:.4rem 0 .2rem}}
+.copy code{{flex:1;min-width:0;overflow-wrap:anywhere;font-size:.82rem;background:var(--page);border:1px solid var(--rule);
+border-radius:8px;padding:8px}}
+.copy button{{flex:none;font:inherit;font-weight:600;border:1px solid var(--rule);border-radius:8px;background:var(--surface);
+color:var(--ink);padding:0 12px}}
+.nota{{color:var(--ink2);font-size:.9rem}}
+</style></head>
+<body><main>
+<h1>Aggiungi il widget al telefono</h1>
+<p class="sub">Serve l'app gratuita <strong>KWGT</strong> (Play Store). Il widget è un'immagine che si aggiorna da sola
+ogni 30 minuti.</p>
+<img src="widget.png?v={versione}" width="1200" height="600" alt="Anteprima del widget: stato, livelli di Leo e Panaro, pioggia, previsione e allerta">
+
+<h2>Metodo 1 · con il file pronto</h2>
+<div class="card"><ol class="passi">
+<li><a class="btn" href="{kwgt.NOME_FILE}" download>Scarica il widget</a><br>
+<span class="nota">Il file <code>{kwgt.NOME_FILE}</code> finisce nella cartella <em>Download</em>.</span></li>
+<li>Sulla schermata Home tieni premuto su uno spazio vuoto → <strong>Widget</strong> → <strong>KWGT</strong> →
+trascina sulla Home il widget <strong>4×2</strong>.</li>
+<li>Tocca il widget vuoto: si apre KWGT. Cerca il comando per caricare un preset da file (può chiamarsi
+<em>Load preset</em>, <em>Importa</em> o essere un'icona a forma di cartella) e scegli <code>{kwgt.NOME_FILE}</code>
+dalla cartella <em>Download</em>.</li>
+<li>Tocca l'icona del <strong>dischetto</strong> in alto per salvare. Fatto.</li>
+</ol>
+<p class="nota">Se KWGT non trova il file o chiede la versione a pagamento, usa il metodo 2: funziona anche con la versione gratuita.</p></div>
+
+<h2>Metodo 2 · a mano (6 passi)</h2>
+<div class="card"><ol class="passi">
+<li>Aggiungi sulla Home un widget <strong>KWGT 4×2</strong> (come al passo 2 sopra) e toccalo: si apre KWGT.
+Se propone dei widget pronti, scegli di crearne uno nuovo/vuoto.</li>
+<li>Tocca <strong>+</strong> in alto a destra e scegli <strong>Immagine</strong> (in inglese <em>Image</em>).</li>
+<li>Tocca la riga <strong>Immagine</strong> appena creata, poi la voce <strong>Bitmap</strong>.
+Tocca l'icona della <strong>calcolatrice</strong> (formula), cancella quello che c'è e incolla questo testo:
+{copia("f1", f_img)}</li>
+<li>Sempre nell'immagine, tocca <strong>Larghezza</strong> (<em>Width</em>) → icona della calcolatrice → incolla:
+{copia("f2", f_larg)}</li>
+<li>Facoltativo, per aprire i grafici toccando il widget: scheda <strong>Touch</strong> → <strong>+</strong> →
+azione <em>Open link</em> (Apri link) → incolla:
+{copia("f3", pagina)}</li>
+<li>Tocca il <strong>dischetto</strong> in alto per salvare e torna alla Home.</li>
+</ol></div>
+
+<h2>Se qualcosa non va</h2>
+<ul>
+<li><strong>Il widget resta vuoto:</strong> controlla la connessione e che il testo incollato sia identico (usa i
+pulsanti Copia).</li>
+<li><strong>Non si aggiorna:</strong> nelle impostazioni del telefono togli KWGT dall'ottimizzazione della batteria.</li>
+<li><strong>Il tocco non apre nulla</strong> (alcuni Xiaomi/OnePlus): impostazioni di KWGT → <em>Notification Mode</em> → <em>FORCED</em>.</li>
+</ul>
+<p><a href="index.html">← Torna ai grafici e ai valori</a></p>
+<footer>{_e(cfg["pubblicazione"]["disclaimer"])}. Fonte: Allerta Meteo Emilia-Romagna (Arpae), CC BY-NC-SA 4.0.</footer>
+</main>
+<script>
+function copia(id, btn) {{
+  var t = document.getElementById(id).textContent;
+  var ok = function () {{ btn.textContent = "Copiato"; setTimeout(function () {{ btn.textContent = "Copia"; }}, 2000); }};
+  if (navigator.clipboard && navigator.clipboard.writeText) {{
+    navigator.clipboard.writeText(t).then(ok, function () {{ seleziona(id); }});
+  }} else {{ seleziona(id); }}
+}}
+function seleziona(id) {{
+  var r = document.createRange(); r.selectNodeContents(document.getElementById(id));
+  var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}}
+</script>
+</body></html>
+"""
+
+
 def genera_tutto(st: dict, cfg: dict, widget: dict, now: datetime, out: Path) -> list[Path]:
+    from fanano import kwgt, widget_img
     files = genera_grafici(st, cfg, widget, now, out)
-    p = out / "index.html"
-    p.write_text(pagina_index(st, cfg, widget, now), encoding="utf-8")
-    return files + [p]
+    files += widget_img.genera(widget, cfg, out)
+    files.append(kwgt.genera(cfg, out, out / "widget.png"))
+    for nome, contenuto in (("index.html", pagina_index(st, cfg, widget, now)),
+                            ("kwgt.html", pagina_kwgt(cfg, widget, now))):
+        p = out / nome
+        p.write_text(contenuto, encoding="utf-8")
+        files.append(p)
+    return files

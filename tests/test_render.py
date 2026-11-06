@@ -19,9 +19,10 @@ def test_genera_tutto(stato, cfg, tmp_path):
     w = compute.costruisci_widget(stato, cfg, NOW)
     files = render.genera_tutto(stato, cfg, w, NOW, tmp_path)
     nomi = sorted(f.name for f in files)
-    assert nomi == ["index.html", "leo.png", "leo_dark.png", "panaro.png", "panaro_dark.png"]
+    assert nomi == ["Fanano_meteo.kwgt", "index.html", "kwgt.html", "leo.png", "leo_dark.png", "panaro.png",
+                    "panaro_dark.png", "widget.png", "widget_dark.png"]
     for f in files:
-        if f.suffix == ".png":
+        if f.suffix == ".png" and not f.name.startswith("widget"):
             assert dimensioni_png(f) == (render.W, render.H)
             assert f.stat().st_size > 20_000
 

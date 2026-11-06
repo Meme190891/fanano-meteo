@@ -7,12 +7,17 @@ portale [Allerta Meteo Emilia-Romagna](https://allertameteo.regione.emilia-romag
 > **Dati Arpae in tempo reale, non validati.** Elaborazione non ufficiale per uso personale: per decisioni
 > di sicurezza fare riferimento ai canali ufficiali (Allerta Meteo Emilia-Romagna, Protezione Civile, Comune).
 
-![Anteprima del widget 4×2](docs/kwgt-layout.png)
+Per aggiungere il widget al telefono apri **https://meme190891.github.io/fanano-meteo/kwgt.html** dal telefono.
+
+![Widget](https://meme190891.github.io/fanano-meteo/widget.png)
 
 ## Indirizzi pubblici
 
 | Cosa | URL |
 |---|---|
+| **Istruzioni per aggiungere il widget (da aprire sul telefono)** | https://meme190891.github.io/fanano-meteo/kwgt.html |
+| Widget pronto per KWGT | https://meme190891.github.io/fanano-meteo/Fanano_meteo.kwgt |
+| Immagine del widget (tema chiaro / scuro) | `.../widget.png` · `.../widget_dark.png` |
 | Dati per il widget | https://meme190891.github.io/fanano-meteo/widget.json |
 | Pagina con grafici e tabelle (da aprire toccando il widget) | https://meme190891.github.io/fanano-meteo/index.html |
 | Grafico Leo (tema chiaro / scuro) | `.../leo.png` · `.../leo_dark.png` |
@@ -166,7 +171,32 @@ Tutti i valori sono già formattati (testo), tranne i flag `true`/`false` e `sta
 
 ## Guida al widget KWGT
 
-Le formule sono verificate sulla [documentazione Kustom](https://docs.kustom.rocks/):
+**Il modo più semplice:** apri dal telefono **https://meme190891.github.io/fanano-meteo/kwgt.html** e segui i passi.
+Il widget è un'unica immagine (`widget.png`, o `widget_dark.png` con il tema scuro) che il server ridisegna ogni
+30 minuti, quindi in KWGT non serve comporre testi e formule.
+
+- **Metodo 1, file pronto:** scarica `Fanano_meteo.kwgt`, aggiungi sulla Home un widget KWGT 4×2, toccalo e
+  carica il preset dal file nella cartella Download, poi salva.
+  - Il file contiene un solo elemento immagine e il tocco che apre `index.html`.
+  - Il formato `.kwgt` non è documentato ufficialmente: il file ricalca la struttura di preset reali esportati
+    da KWGT (versione 13), ma non è stato provato su un telefono.
+- **Metodo 2, a mano (6 passi, funziona anche con KWGT gratuito):**
+  1. Aggiungi un widget KWGT 4×2 e toccalo.
+  2. **+** → **Immagine**.
+  3. **Bitmap** → formula → incolla il testo indicato nella pagina.
+  4. **Larghezza** → formula → incolla `$mu(min, si(rwidth), si(rheight) * 2)$`.
+  5. Facoltativo: tocco → *Open link* → `index.html`.
+  6. Salva.
+
+  La pagina ha i pulsanti "Copia" per ogni testo.
+
+L'immagine dice tutto quello che serve: stato complessivo, livelli e tendenze di Leo e Panaro con il colore della
+soglia, pioggia 1h/24h, previsione, allerta, ora dell'aggiornamento (in rosso se i dati sono vecchi).
+
+### Avanzato (facoltativo): widget composto da testi
+
+Chi preferisce un widget fatto di testi veri, con dimensioni e colori personalizzabili, può costruirlo leggendo
+`widget.json`. Le formule sono verificate sulla [documentazione Kustom](https://docs.kustom.rocks/):
 [`wg`](https://docs.kustom.rocks/docs/reference/functions/wg/) (JSON con espressione JSONPath),
 [`gv`](https://docs.kustom.rocks/docs/reference/functions/gv/) (variabili globali),
 [`si(darkmode)`](https://docs.kustom.rocks/docs/reference/functions/si/),
@@ -174,13 +204,13 @@ Le formule sono verificate sulla [documentazione Kustom](https://docs.kustom.roc
 [`mu(floor, …)`](https://docs.kustom.rocks/docs/reference/functions/mu/).
 I nomi delle voci di menu possono variare leggermente tra versioni e lingue dell'app.
 
-### 1. Crea il widget
+#### 1. Crea il widget
 
 1. Installa **KWGT** dal Play Store.
 2. Tieni premuto sulla home → **Widget** → **KWGT** → scegli la misura **4×2** e posizionalo.
 3. Tocca il widget vuoto: si apre l'editor di KWGT. Crea un preset vuoto.
 
-### 2. Variabile globale con l'URL (gestisce anche l'aggiornamento)
+#### 2. Variabile globale con l'URL (gestisce anche l'aggiornamento)
 
 KWGT riscarica un contenuto web quando cambia il suo URL: è il metodo indicato dalla
 [ricetta ufficiale](https://docs.kustom.rocks/categories/Web-Content/), che aggiunge un parametro
@@ -196,7 +226,7 @@ https://meme190891.github.io/fanano-meteo/widget.json?t=$mu(floor, (df(S) - 900)
 Se la tua versione non valuta le formule dentro le globali, usa l'URL completo direttamente in ogni formula, così:
 `$wg("https://meme190891.github.io/fanano-meteo/widget.json?t=" + mu(floor, (df(S) - 900) / 1800), json, .stato)$`
 
-### 3. Struttura
+#### 3. Struttura
 
 - **Sfondo:** un modulo **Shape** (rettangolo) a tutta dimensione, angoli arrotondati ~20, colore
   semitrasparente, per esempio `#B3141414` (scuro) oppure `#E0FCFCFB` (chiaro); il formato è `#AARRGGBB`.
@@ -207,7 +237,7 @@ Se la tua versione non valuta le formule dentro le globali, usa l'URL completo d
 - **Colori da formula:** nella proprietà del colore tocca l'icona della formula (calcolatrice) e incolla la
   formula `…_colore`.
 
-### 4. Formule (il numero corrisponde all'immagine)
+#### 4. Formule (il numero corrisponde all'immagine)
 
 | # | Elemento | Formula |
 |---|---|---|
@@ -230,7 +260,7 @@ Altre formule utili:
 - testo rosso quando i dati sono vecchi, come formula del colore (`dato_vecchio` arriva come testo
   `true`/`false`): `$if(wg(gv(url), json, .dato_vecchio) = true, #D03B3B, #FFFFFF)$`.
 
-### 5. Tocco: apri la pagina con i grafici
+#### 5. Tocco: apri la pagina con i grafici
 
 Sull'elemento radice (o sullo Stack Group) → tab **Touch** → togli l'azione predefinita che apre l'editor →
 aggiungi un'azione **Open Link** con URL:
@@ -243,7 +273,7 @@ La pagina mostra i grafici nel tema del telefono, le tabelle dei valori e i link
 Su alcuni Xiaomi e OnePlus il tocco funziona solo con Impostazioni di Kustom → **Notification Mode** →
 **FORCED** ([documentazione](https://docs.kustom.rocks/docs/common_issues/touch_launch_not_working/)).
 
-### 6. (Facoltativo) Grafico PNG in un widget
+#### 6. (Facoltativo) Grafico PNG in un widget
 
 I grafici sono verticali (1080×1330), quindi conviene un secondo widget **4×4** o **4×5**. Aggiungi un
 modulo **Image** a tutta larghezza → proprietà **Bitmap** → passa a **formula**:
@@ -254,19 +284,18 @@ $if(si(darkmode) = 1, "https://meme190891.github.io/fanano-meteo/leo_dark.png", 
 
 Al posto di `leo` puoi mettere `panaro`. `si(darkmode)` vale 1 quando il telefono è in tema scuro.
 
-### 7. Salva e verifica
+#### 7. Salva e verifica
 
 Salva con l'icona del dischetto. Se compare testo vuoto o un errore:
 - apri https://meme190891.github.io/fanano-meteo/widget.json nel browser per vedere se i dati ci sono;
 - controlla di aver scritto `url` uguale in globali e formule;
 - escludi KWGT dall'ottimizzazione della batteria, così può aggiornarsi in background.
 
-### Preset .kwgt
+#### Preset .kwgt
 
-Non è incluso un preset importabile. Kustom non documenta il formato interno dei file `.kwgt`, e un preset
-generato senza poterlo provare su un telefono rischierebbe di non importarsi o di importarsi rotto.
-Le istruzioni sopra richiedono circa 15 minuti. Una volta costruito il widget, conviene esportarlo
-dal menu dell'editor di KWGT come copia di sicurezza.
+Il preset pronto (`Fanano_meteo.kwgt`, metodo 1) contiene la versione a immagine. Per la versione a testi non
+c'è un preset: una volta costruito il widget, conviene esportarlo dal menu dell'editor di KWGT come copia di
+sicurezza.
 
 ## Limiti
 
@@ -331,14 +360,16 @@ dal menu dell'editor di KWGT come copia di sicurezza.
 config.yaml                   stazioni, regole, colori, URL di pubblicazione
 fanano/arpae.py               URL, download e parsing degli endpoint Arpae (+ --elenca, --save)
 fanano/compute.py             storico, cumulate, tendenza, soglie, stato complessivo, fallback
-fanano/render.py              grafici PNG e index.html
+fanano/render.py              grafici PNG, index.html e kwgt.html (istruzioni per il telefono)
+fanano/widget_img.py          il widget intero come immagine (widget.png / widget_dark.png)
+fanano/kwgt.py                preset KWGT importabile (Fanano_meteo.kwgt)
 fanano/main.py                esecuzione completa (online o da cartella di risposte salvate)
 fanano/probe.py               diagnostica di raggiungibilità
 tests/                        test (parsing, calcoli, fallback, grafici, config) + fixture Arpae reali
 .github/workflows/aggiorna.yml  pianificato ogni 30': genera e pubblica su gh-pages; keepalive settimanale
 .github/workflows/tests.yml     test a ogni push
 .github/workflows/probe.yml     diagnostica manuale
-docs/kwgt-layout.png          anteprima del widget
+docs/kwgt-layout.png          anteprima del widget composto da testi (sezione avanzata)
 DATA-LICENSE                  licenza dei dati pubblicati
 ```
 
