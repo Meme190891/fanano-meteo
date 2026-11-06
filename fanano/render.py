@@ -431,26 +431,17 @@ color:var(--ink);padding:0 12px}}
 </style></head>
 <body><main>
 <h1>Aggiungi il widget al telefono</h1>
-<p class="sub">Serve l'app gratuita <strong>KWGT</strong> (Play Store). Il widget è un'immagine che si aggiorna da sola
+<p class="sub">Serve l'app <strong>KWGT</strong> (Play Store). Il widget è un'immagine che si aggiorna da sola
 ogni 30 minuti.</p>
 <img src="widget.png?v={versione}" width="1200" height="600" alt="Anteprima del widget: stato, livelli di Leo e Panaro, pioggia, previsione e allerta">
+<div class="card"><p><strong>Hai KWGT gratuito?</strong> Usa il metodo 1: creare un widget da zero è gratis.
+<br><strong>Hai KWGT PRO?</strong> Puoi usare il metodo 2, più veloce: importare un widget già pronto è una
+funzione della versione PRO.</p></div>
 
-<h2>Metodo 1 · con il file pronto</h2>
+<h2>Metodo 1 · a mano, gratis (6 passi)</h2>
 <div class="card"><ol class="passi">
-<li><a class="btn" href="{kwgt.NOME_FILE}" download>Scarica il widget</a><br>
-<span class="nota">Il file <code>{kwgt.NOME_FILE}</code> finisce nella cartella <em>Download</em>.</span></li>
 <li>Sulla schermata Home tieni premuto su uno spazio vuoto → <strong>Widget</strong> → <strong>KWGT</strong> →
-trascina sulla Home il widget <strong>4×2</strong>.</li>
-<li>Tocca il widget vuoto: si apre KWGT. Cerca il comando per caricare un preset da file (può chiamarsi
-<em>Load preset</em>, <em>Importa</em> o essere un'icona a forma di cartella) e scegli <code>{kwgt.NOME_FILE}</code>
-dalla cartella <em>Download</em>.</li>
-<li>Tocca l'icona del <strong>dischetto</strong> in alto per salvare. Fatto.</li>
-</ol>
-<p class="nota">Se KWGT non trova il file o chiede la versione a pagamento, usa il metodo 2: funziona anche con la versione gratuita.</p></div>
-
-<h2>Metodo 2 · a mano (6 passi)</h2>
-<div class="card"><ol class="passi">
-<li>Aggiungi sulla Home un widget <strong>KWGT 4×2</strong> (come al passo 2 sopra) e toccalo: si apre KWGT.
+trascina sulla Home il widget <strong>4×2</strong>. Poi tocca il widget: si apre KWGT.
 Se propone dei widget pronti, scegli di crearne uno nuovo/vuoto.</li>
 <li>Tocca <strong>+</strong> in alto a destra e scegli <strong>Immagine</strong> (in inglese <em>Image</em>).</li>
 <li>Tocca la riga <strong>Immagine</strong> appena creata, poi la voce <strong>Bitmap</strong>.
@@ -463,6 +454,17 @@ azione <em>Open link</em> (Apri link) → incolla:
 {copia("f3", pagina)}</li>
 <li>Tocca il <strong>dischetto</strong> in alto per salvare e torna alla Home.</li>
 </ol></div>
+
+<h2>Metodo 2 · con il file pronto (richiede KWGT PRO)</h2>
+<div class="card"><ol class="passi">
+<li><a class="btn" href="{kwgt.NOME_FILE}" download>Scarica il widget</a><br>
+<span class="nota">Il file <code>{kwgt.NOME_FILE}</code> finisce nella cartella <em>Download</em>.</span></li>
+<li>Aggiungi sulla Home un widget <strong>KWGT 4×2</strong> e toccalo (come al passo 1 del metodo 1).</li>
+<li>Tocca <strong>Load Preset</strong> (Carica preset) → icona della <strong>cartella</strong> in alto →
+<strong>Import</strong> → scegli <code>{kwgt.NOME_FILE}</code> dalla cartella <em>Download</em>.</li>
+<li>Tocca l'icona del <strong>dischetto</strong> in alto per salvare. Fatto.</li>
+</ol>
+<p class="nota">Senza PRO, KWGT chiede di acquistarla: è normale, usa il metodo 1.</p></div>
 
 <h2>Se qualcosa non va</h2>
 <ul>

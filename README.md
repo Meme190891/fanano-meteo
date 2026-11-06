@@ -175,12 +175,7 @@ Tutti i valori sono già formattati (testo), tranne i flag `true`/`false` e `sta
 Il widget è un'unica immagine (`widget.png`, o `widget_dark.png` con il tema scuro) che il server ridisegna ogni
 30 minuti, quindi in KWGT non serve comporre testi e formule.
 
-- **Metodo 1, file pronto:** scarica `Fanano_meteo.kwgt`, aggiungi sulla Home un widget KWGT 4×2, toccalo e
-  carica il preset dal file nella cartella Download, poi salva.
-  - Il file contiene un solo elemento immagine e il tocco che apre `index.html`.
-  - Il formato `.kwgt` non è documentato ufficialmente: il file ricalca la struttura di preset reali esportati
-    da KWGT (versione 13), ma non è stato provato su un telefono.
-- **Metodo 2, a mano (6 passi, funziona anche con KWGT gratuito):**
+- **Metodo 1, a mano (6 passi, funziona con KWGT gratuito):**
   1. Aggiungi un widget KWGT 4×2 e toccalo.
   2. **+** → **Immagine**.
   3. **Bitmap** → formula → incolla il testo indicato nella pagina.
@@ -189,6 +184,14 @@ Il widget è un'unica immagine (`widget.png`, o `widget_dark.png` con il tema sc
   6. Salva.
 
   La pagina ha i pulsanti "Copia" per ogni testo.
+- **Metodo 2, file pronto (richiede KWGT PRO):** scarica `Fanano_meteo.kwgt`, aggiungi un widget KWGT 4×2,
+  toccalo → **Load Preset** → icona della cartella → **Import** → scegli il file in Download → salva.
+  - Secondo la [documentazione di Kustom](https://docs.kustom.rocks/docs/general_information/cracked_free/),
+    creare un widget da zero è sempre gratis, mentre importare un preset fatto da altri richiede la chiave PRO
+    (pagamento unico).
+  - Il file contiene un solo elemento immagine e il tocco che apre `index.html`. Il formato `.kwgt` non è
+    documentato ufficialmente: il file ricalca la struttura di preset reali esportati da KWGT (versione 13), ma
+    non è stato provato su un telefono.
 
 L'immagine dice tutto quello che serve: stato complessivo, livelli e tendenze di Leo e Panaro con il colore della
 soglia, pioggia 1h/24h, previsione, allerta, ora dell'aggiornamento (in rosso se i dati sono vecchi).
