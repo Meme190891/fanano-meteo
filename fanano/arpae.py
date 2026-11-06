@@ -334,6 +334,29 @@ def parse_previsione(html: str, zona: str = "rilievi", oggi: date | None = None)
 
 # --------------------------------------------------------------------------- CLI di verifica
 
+def elenca(cfg: dict, session: requests.Session, tipo: str, cerca: str, massimo: int, timeout: float) -> int:
+    """Stampa le stazioni Arpae di un tipo, ordinate per distanza dal primo idrometro configurato."""
+    import math
+    var = cfg["variabili"]["livello" if tipo == "idrometri" else "pioggia_oraria"]
+    url = f"{_base(cfg)}/o/api/allerta/get-sensor-values?variabile={var}&time={slot_ms()}"
+    stazioni = parse_livelli(fetch(session, url, timeout=timeout).json())
+    rif = parse_livelli(fetch(session, url_livelli(cfg), timeout=timeout).json(), {cfg["torrenti"][0]["id"]})
+    lat0, lon0 = next(((r.lat, r.lon) for r in rif.values()), (44.2039, 10.7991))
+
+    def km(s: Idrometro) -> float:
+        dx = (s.lon - lon0) * 111.32 * math.cos(math.radians(lat0))
+        return math.hypot(dx, (s.lat - lat0) * 110.57)
+
+    righe = sorted((s for s in stazioni.values() if cerca.lower() in s.nome.lower()), key=km)[:massimo]
+    print(f"{'ID':>6}  {'nome':28} {'lat':>9} {'lon':>9} {'km':>6}  ultimo valore" +
+          ("   soglie 1/2/3" if tipo == "idrometri" else ""))
+    for s in righe:
+        soglie = (f"   {s.soglia1 or '-'}/{s.soglia2 or '-'}/{s.soglia3 or '-'}" if tipo == "idrometri" else "")
+        print(f"{s.id:>6}  {s.nome[:28]:28} {s.lat:9.5f} {s.lon:9.5f} {km(s):6.1f}  {s.valore}{soglie}")
+    print(f"\n(distanze dall'idrometro {cfg['torrenti'][0]['id']}; il valore pluviometrico e' la pioggia dell'ultima ora)")
+    return 0
+
+
 def _fmt(t: datetime) -> str:
     return t.astimezone(ROME).strftime("%d/%m %H:%M")
 
@@ -341,11 +364,17 @@ def _fmt(t: datetime) -> str:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Scarica e mostra i dati Arpae per Fanano (una richiesta per endpoint).")
     ap.add_argument("--save", type=Path, help="cartella dove salvare le risposte grezze")
+    ap.add_argument("--elenca", choices=["idrometri", "pluviometri"],
+                    help="elenca le stazioni Arpae (ID, nome, coordinate, soglie) ordinate per distanza")
+    ap.add_argument("--cerca", default="", help="con --elenca: filtra per nome (es. Fanano)")
+    ap.add_argument("--max", type=int, default=15, help="con --elenca: numero massimo di righe (default 15)")
     args = ap.parse_args(argv)
     cfg = load_config()
     session = make_session(cfg)
     timeout = cfg["arpae"].get("timeout_s", 20)
     base = _base(cfg)
+    if args.elenca:
+        return elenca(cfg, session, args.elenca, args.cerca, args.max, timeout)
     if args.save:
         args.save.mkdir(parents=True, exist_ok=True)
 

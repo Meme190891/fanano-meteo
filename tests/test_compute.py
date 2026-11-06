@@ -244,3 +244,16 @@ def test_dato_vecchio_dopo_2_ore(stato, cfg):
     w = widget(stato, cfg, now=NOW + timedelta(hours=1, minutes=19))                                # 2h01'
     assert w["leo_vecchio"] is True and w["pratignano_vecchio"] is True
     assert w["prev_vecchio"] is False and w["allerta_vecchio"] is False
+
+
+def test_righe_composte(stato, cfg):
+    w = widget(stato, cfg)
+    assert w["riga_leo"] == "Leo -0.45 m →"
+    assert w["riga_panaro"] == "Panaro 0.77 m →"
+    assert w["riga_pioggia"] == "1h/24h mm: Prat. 0.2/3.6 · Scaff. 0.6/3.6"
+    assert w["riga_previsione"] == "Prev. oggi 4-5 · dom. 0 · 3gg 4-5 mm"
+    assert w["riga_allerta"] == "Allerta E1: oggi verde · domani verde"
+    assert w["riga_aggiornamento"] == "Agg. 11:42 · Arpae, non validati"
+    vecchio = widget(stato, cfg, now=NOW + timedelta(hours=3))
+    assert vecchio["riga_leo"] == "Leo -0.45 m → !"
+    assert vecchio["riga_aggiornamento"] == "Agg. 14:42 · DATI VECCHI · Arpae, non validati"

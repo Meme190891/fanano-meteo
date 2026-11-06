@@ -372,6 +372,20 @@ def costruisci_widget(st: dict, cfg: dict, now: datetime, errori: list[str] | No
     w["stato_colore"] = col[LIVELLO_COLORE[livello]]
     w["dato_vecchio"] = any(vecchi.values())
 
+    # ---- righe gia' composte per il widget (una formula KWGT per riga)
+    for t in cfg["torrenti"]:
+        k = t["chiave"]
+        w[f"riga_{k}"] = (f"{t.get('nome_breve', t['nome'])} {w[f'{k}_livello']} {w[f'{k}_freccia']}"
+                          + (" !" if w[f"{k}_vecchio"] else ""))
+    w["riga_pioggia"] = "1h/24h mm: " + " · ".join(
+        f"{p.get('sigla', p.get('nome_breve', p['nome']))} {w[p['chiave'] + '_1h']}/{w[p['chiave'] + '_24h']}"
+        for p in cfg["pluviometri"])
+    w["riga_previsione"] = (f"Prev. oggi {w['prev_oggi'].replace(' mm', '')} · dom. "
+                            f"{w['prev_domani'].replace(' mm', '')} · 3gg {w['prev_72h']}")
+    w["riga_allerta"] = f"Allerta {zona}: oggi {w['allerta_oggi']} · domani {w['allerta_domani']}"
+    w["riga_aggiornamento"] = (f"Agg. {now.astimezone(ROME):%H:%M}"
+                               + (" · DATI VECCHI" if w["dato_vecchio"] else "") + " · Arpae, non validati")
+
     # ---- metadati
     w["errori"] = "; ".join(errori or [])
     w["pagina"] = f"{base}/index.html"

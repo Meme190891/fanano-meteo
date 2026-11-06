@@ -160,7 +160,7 @@ def test_parse_prec(cella, atteso):
 # ------------------------------------------------------------------ URL
 
 def test_endpoint_urls():
-    cfg = load_config()
+    cfg = load_config(Path(__file__).parent / "config_test.yaml")
     now = datetime(2026, 11, 6, 10, 41, tzinfo=timezone.utc)
     urls = arpae.endpoint_urls(cfg, now)
     assert len(urls) == 8                                  # 1 livelli + 2 + 2 serie + 2 allerta + 1 previsione

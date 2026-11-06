@@ -42,10 +42,12 @@ pluviometri:
   - chiave: pratignano
     nome: "Lago Pratignano"
     nome_breve: "Pratignano"
+    sigla: "Prat."          # usata nelle righe compatte del widget
     id: "5501"
   - chiave: scaffaiolo
     nome: "Lago Scaffaiolo"
     nome_breve: "Scaffaiolo"
+    sigla: "Scaff."          # usata nelle righe compatte del widget
     id: "12461"
 
 # Regole di calcolo (vedi README, sezione "Regole")

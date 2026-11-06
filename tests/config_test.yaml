@@ -1,0 +1,80 @@
+# Copia CONGELATA di config.yaml usata dai test (le fixture corrispondono a queste stazioni).
+# Modifica config.yaml per cambiare il widget; questo file serve solo ai test.
+# Configurazione del widget meteo-idrologico di Fanano.
+# Si possono aggiungere o togliere stazioni senza toccare il codice.
+# ID e codici variabile sono quelli usati dal portale Allerta Meteo Emilia-Romagna (Arpae).
+
+arpae:
+  base_url: "https://allertameteo.regione.emilia-romagna.it"
+  user_agent: "fanano-meteo-widget/0.1 (+https://github.com/Meme190891/fanano-meteo)"
+  timeout_s: 20
+
+# Codici variabile Arpae (formato: timerange/livello/codice BUFR)
+variabili:
+  livello: "254,0,0/1,-,-,-/B13215"        # livello idrometrico istantaneo (m)
+  pioggia_oraria: "1,0,3600/1,-,-,-/B13011" # precipitazione cumulata su 1 ora (mm)
+
+# Zona di allertamento di Fanano (layer comuni del portale: FANANO -> E1)
+zona_allerta: "E1"
+
+# Provincia per la previsione ufficiale (pagina "Previsioni regionali" del portale)
+previsione:
+  provincia: "MO"
+  zona: "rilievi"   # colonna della tabella da usare: "rilievi" o "pianura"
+
+# Idrometri mostrati nel widget, nell'ordine delle righe
+torrenti:
+  - chiave: leo
+    nome: "Leo a Fanano"
+    nome_breve: "Leo"
+    id: "5503"
+    corso_acqua: "T. Leo"
+    pluviometri: [pratignano, scaffaiolo]
+  - chiave: panaro
+    nome: "Panaro a P.te Val di Sasso"
+    nome_breve: "Panaro"
+    id: "5434"
+    corso_acqua: "F. Panaro"
+    pluviometri: [pratignano, scaffaiolo]
+
+nota_torrenti: "Ospitale e Fellicarolo: nessun idrometro Arpae"
+
+# Pluviometri per la pioggia osservata
+pluviometri:
+  - chiave: pratignano
+    nome: "Lago Pratignano"
+    nome_breve: "Pratignano"
+    sigla: "Prat."          # usata nelle righe compatte del widget
+    id: "5501"
+  - chiave: scaffaiolo
+    nome: "Lago Scaffaiolo"
+    nome_breve: "Scaffaiolo"
+    sigla: "Scaff."          # usata nelle righe compatte del widget
+    id: "12461"
+
+# Regole di calcolo (vedi README, sezione "Regole")
+regole:
+  storico_ore: 96                 # ore di serie conservate in state.json
+  dato_vecchio_ore: 2             # un dato osservato piu' vecchio di cosi' e' "vecchio"
+  previsione_vecchia_ore: 24      # oltre, la previsione e' vecchia anche se contiene oggi
+  tendenza_ore: 3                 # confronto livello attuale con quello di N ore prima
+  tendenza_tolleranza_min: 20     # campione di riferimento accettato entro +/- N minuti
+  tendenza_soglia_m: 0.05         # variazione minima per "su"/"giu'"
+  pioggia_osservata_24h_mm: 30    # stato "Pioggia abbondante ultime 24h"
+  pioggia_prevista_mm: 30         # stato "Pioggia abbondante prevista" (max rilievi oggi o domani)
+  previsione_cambio_ora: 14       # "prossime 24h" = oggi fino a quest'ora, poi domani
+  eventi_allerta: [idraulica, idrogeologica, temporali]   # eventi che entrano nello stato complessivo
+  testo_previsione_max: 110       # lunghezza massima del testo breve di previsione
+
+# Colori di stato (palette di stato fissa, uguale per widget e grafici): sempre accompagnati da un'etichetta
+colori:
+  verde: "#0CA30C"
+  giallo: "#FAB219"
+  arancio: "#EC835A"
+  rosso: "#D03B3B"
+  grigio: "#898781"
+
+pubblicazione:
+  base_url: "https://meme190891.github.io/fanano-meteo"
+  disclaimer: "Dati Arpae in tempo reale, non validati"
+  fonte: "Allerta Meteo Emilia-Romagna - allertameteo.regione.emilia-romagna.it (CC BY-NC-SA 4.0)"

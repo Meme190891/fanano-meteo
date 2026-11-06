@@ -8,6 +8,7 @@ from fanano import compute, main
 from fanano.config import load_config
 
 FIX = Path(__file__).parent / "fixtures"
+CONFIG_TEST = Path(__file__).parent / "config_test.yaml"
 UTC = timezone.utc
 # istante in cui sono state salvate le fixture (06/11/2026 11:42 ora italiana)
 NOW = datetime(2026, 11, 6, 10, 42, tzinfo=UTC)
@@ -15,7 +16,7 @@ NOW = datetime(2026, 11, 6, 10, 42, tzinfo=UTC)
 
 @pytest.fixture(scope="session")
 def cfg():
-    return load_config()
+    return load_config(CONFIG_TEST)
 
 
 @pytest.fixture(scope="session")
