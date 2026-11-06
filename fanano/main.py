@@ -91,9 +91,15 @@ def scrivi_json(path: Path, obj) -> None:
     os.replace(tmp, path)
 
 
-def esegui(cfg: dict, out: Path, stato_path: Path, raccolta: dict, now: datetime) -> dict:
+def esegui(cfg: dict, out: Path, stato_path: Path, raccolta: dict, now: datetime, grafici: bool = True) -> dict:
     stato, errori = compute.aggiorna_stato(leggi_stato(stato_path), raccolta, now, cfg)
     widget = compute.costruisci_widget(stato, cfg, now, errori)
+    if grafici:
+        try:
+            from fanano import render
+            render.genera_tutto(stato, cfg, widget, now, out)
+        except Exception as exc:  # noqa: BLE001 - un grafico rotto non deve bloccare widget.json
+            widget["errori"] = "; ".join(x for x in (widget["errori"], f"grafici: {type(exc).__name__}: {exc}") if x)
     scrivi_json(out / "state.json", stato)
     scrivi_json(out / "widget.json", widget)
     return widget
@@ -106,6 +112,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--da-cartella", type=Path, help="usa risposte salvate invece della rete")
     ap.add_argument("--now", help="istante ISO da usare come 'adesso' (solo per prove offline)")
     ap.add_argument("--config", type=Path, help="config.yaml alternativo")
+    ap.add_argument("--senza-grafici", action="store_true", help="non generare PNG e index.html")
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config) if args.config else load_config()
@@ -114,7 +121,8 @@ def main(argv: list[str] | None = None) -> int:
         now = now.replace(tzinfo=UTC)
     raccolta = (raccogli_da_cartella(args.da_cartella, cfg, now) if args.da_cartella
                 else raccogli_online(cfg, now))
-    widget = esegui(cfg, args.out, args.stato or args.out / "state.json", raccolta, now)
+    widget = esegui(cfg, args.out, args.stato or args.out / "state.json", raccolta, now,
+                    grafici=not args.senza_grafici)
     print(json.dumps(widget, ensure_ascii=False, indent=1))
     if widget["errori"]:
         print(f"\nFonti fallite (mantenuto l'ultimo dato valido): {widget['errori']}", file=sys.stderr)

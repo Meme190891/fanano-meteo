@@ -46,7 +46,7 @@ def test_primo_avvio_senza_dati(cfg):
     st, errori = compute.aggiorna_stato(None, tutte_fallite(cfg), NOW, cfg)
     w = compute.costruisci_widget(st, cfg, NOW, errori)
     json.dumps(w)
-    assert w["leo_livello"] == "n.d." and w["leo_tendenza"] == "n.d." and w["leo_colore"] == "#9E9E9E"
+    assert w["leo_livello"] == "n.d." and w["leo_tendenza"] == "n.d." and w["leo_colore"] == "#898781"
     assert w["pratignano_24h"] == "n.d." and w["prev_24h"] == "n.d." and w["allerta_oggi"] == "n.d."
     assert (w["stato"], w["stato_livello"]) == ("Dati non aggiornati", -1)
     assert w["disclaimer"] == "Dati Arpae in tempo reale, non validati"

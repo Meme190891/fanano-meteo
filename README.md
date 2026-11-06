@@ -9,7 +9,10 @@ pioggia osservata, pioggia prevista, livelli dei torrenti Leo e Panaro, stato di
 >   estratti, `--save DIR` salva anche le risposte grezze);
 > - `fanano/probe.py`: diagnostica di raggiungibilità (`python -m fanano.probe`, workflow `probe`);
 > - `fanano/compute.py` e `fanano/main.py`: storico, cumulate, tendenza, soglie, stato complessivo,
->   fallback; `python -m fanano.main --out out/` genera `out/widget.json` e `out/state.json`;
+>   fallback; `python -m fanano.main --out out/` genera `out/widget.json`, `out/state.json`,
+>   i grafici `out/<torrente>.png` / `out/<torrente>_dark.png` e la pagina `out/index.html`;
+> - `fanano/render.py`: grafici (livello con soglie + pioggia oraria dei due pluviometri, ultime 72 ore,
+>   1080×1330 px, tema chiaro e scuro) e pagina `index.html` con tabelle dei valori e dei dati orari;
 > - `tests/`: test su risposte Arpae reali salvate in `tests/fixtures` (`python -m pytest`).
 
 ## Regole di calcolo

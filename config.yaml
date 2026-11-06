@@ -62,12 +62,13 @@ regole:
   eventi_allerta: [idraulica, idrogeologica, temporali]   # eventi che entrano nello stato complessivo
   testo_previsione_max: 110       # lunghezza massima del testo breve di previsione
 
+# Colori di stato (palette di stato fissa, uguale per widget e grafici): sempre accompagnati da un'etichetta
 colori:
-  verde: "#388E3C"
-  giallo: "#FBC02D"
-  arancio: "#F57C00"
-  rosso: "#D32F2F"
-  grigio: "#9E9E9E"
+  verde: "#0CA30C"
+  giallo: "#FAB219"
+  arancio: "#EC835A"
+  rosso: "#D03B3B"
+  grigio: "#898781"
 
 pubblicazione:
   base_url: "https://meme190891.github.io/fanano-meteo"

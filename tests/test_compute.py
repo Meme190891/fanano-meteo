@@ -124,7 +124,7 @@ def test_widget_da_risposte_reali(stato, cfg):
     assert CHIAVI_OBBLIGATORIE <= set(w)
     assert list(w)[:3] == ["aggiornato", "aggiornato_iso", "stato"]
     assert (w["leo_livello"], w["leo_tendenza"], w["leo_delta3h"], w["leo_soglia"]) == ("-0.45 m", "stabile", "+0.02 m", "normale")
-    assert (w["leo_colore"], w["leo_ora"], w["leo_vecchio"]) == ("#388E3C", "11:00", False)
+    assert (w["leo_colore"], w["leo_ora"], w["leo_vecchio"]) == ("#0CA30C", "11:00", False)
     assert (w["panaro_livello"], w["panaro_soglie"]) == ("0.77 m", "2.0 / 2.8 / 4.0 m")
     assert [w[f"pratignano_{h}h"] for h in (1, 6, 24, 72)] == ["0.2", "3.0", "3.6", "7.6*"]
     assert w["pratignano_72h_parziale"] is True
@@ -133,7 +133,7 @@ def test_widget_da_risposte_reali(stato, cfg):
     assert (w["prev_24h"], w["prev_24h_etichetta"], w["prev_72h"]) == ("4-5 mm", "oggi", "4-5 mm")
     assert w["prev_testo"].startswith("Al mattino molto nuvoloso") and len(w["prev_testo"]) <= 110
     assert (w["allerta_oggi"], w["allerta_domani"], w["allerta_vecchio"]) == ("verde", "verde", False)
-    assert (w["stato"], w["stato_livello"], w["stato_colore"]) == ("Tutto regolare", 0, "#388E3C")
+    assert (w["stato"], w["stato_livello"], w["stato_colore"]) == ("Tutto regolare", 0, "#0CA30C")
     assert w["disclaimer"] == "Dati Arpae in tempo reale, non validati"
     assert w["leo_grafico"] == "https://meme190891.github.io/fanano-meteo/leo.png"
 
@@ -171,14 +171,14 @@ def imposta_allerta(st, giorno, **colori):
 def test_stato_soglia1_giallo(stato, cfg):
     imposta_livello(stato, "leo", 1.1)
     w = widget(stato, cfg)
-    assert (w["stato"], w["stato_livello"], w["stato_colore"]) == ("Attenzione: Leo sopra soglia 1", 1, "#FBC02D")
-    assert (w["leo_soglia"], w["leo_colore"]) == ("soglia 1", "#FBC02D")
+    assert (w["stato"], w["stato_livello"], w["stato_colore"]) == ("Attenzione: Leo sopra soglia 1", 1, "#FAB219")
+    assert (w["leo_soglia"], w["leo_colore"]) == ("soglia 1", "#FAB219")
 
 
 def test_stato_soglia3_rosso(stato, cfg):
     imposta_livello(stato, "leo", 2.1)
     w = widget(stato, cfg)
-    assert (w["stato"], w["stato_livello"], w["stato_colore"]) == ("ALLARME: Leo sopra soglia 3", 3, "#D32F2F")
+    assert (w["stato"], w["stato_livello"], w["stato_colore"]) == ("ALLARME: Leo sopra soglia 3", 3, "#D03B3B")
 
 
 def test_stato_livello_piu_alto_vince(stato, cfg):
@@ -193,7 +193,7 @@ def test_stato_allerta_arancione_idraulica(stato, cfg):
     imposta_allerta(stato, "2026-11-06", idraulica="orange", temporali="yellow")
     w = widget(stato, cfg)
     assert (w["stato"], w["stato_livello"]) == ("Attenzione: Allerta arancione zona E1", 2)
-    assert (w["allerta_oggi"], w["allerta_oggi_colore"]) == ("arancione", "#F57C00")
+    assert (w["allerta_oggi"], w["allerta_oggi_colore"]) == ("arancione", "#EC835A")
     assert w["allerta_oggi_eventi"] == "idraulica arancione, temporali gialla"
 
 
@@ -236,7 +236,7 @@ def test_stato_dati_non_aggiornati(stato, cfg):
     w = widget(stato, cfg, now=NOW + timedelta(days=2))
     assert all(w[k] for k in ("leo_vecchio", "panaro_vecchio", "pratignano_vecchio", "scaffaiolo_vecchio",
                               "prev_vecchio", "allerta_vecchio"))
-    assert (w["stato"], w["stato_livello"], w["stato_colore"]) == ("Dati non aggiornati", -1, "#9E9E9E")
+    assert (w["stato"], w["stato_livello"], w["stato_colore"]) == ("Dati non aggiornati", -1, "#898781")
 
 
 def test_dato_vecchio_dopo_2_ore(stato, cfg):
