@@ -22,7 +22,6 @@ Per aggiungere il widget al telefono apri **https://meme190891.github.io/fanano-
 | Dati per il widget | https://meme190891.github.io/fanano-meteo/widget.json |
 | Pagina con grafici e tabelle (da aprire toccando il widget) | https://meme190891.github.io/fanano-meteo/index.html |
 | Grafico Leo (tema chiaro / scuro) | `.../leo.png` · `.../leo_dark.png` |
-| Grafico Panaro (tema chiaro / scuro) | `.../panaro.png` · `.../panaro_dark.png` |
 | Storico usato dal sistema | `.../state.json` |
 
 I file si aggiornano da soli ogni 30 minuti.
@@ -69,7 +68,6 @@ Tutto dal portale Allerta Meteo Emilia-Romagna (Arpae e Agenzia regionale di pro
 | Ruolo | Nome Arpae | ID | Tipo | Corso d'acqua | Comune | Lat / Lon | Quota | Soglie 1/2/3 |
 |---|---|---|---|---|---|---|---|---|
 | Torrente 1 | Fanano | 5503 | idrometro | T. Leo | Fanano | 44.20386 / 10.79909 | 512 m | 1.0 / 1.3 / 2.0 m |
-| Torrente 2 | Ponte Val di Sasso | 5434 | idrometro | F. Panaro (a valle della confluenza Leo–Scoltenna) | Sestola | 44.27258 / 10.81881 | 367 m | 2.0 / 2.8 / 4.0 m |
 | Pioggia 1 | Lago Pratignano | 5501 | pluviometro | bacino Panaro | Fanano | 44.17740 / 10.81780 | 1319 m | — |
 | Pioggia 2 | Lago Scaffaiolo | 12461 | pluviometro | bacino Panaro (crinale) | Fanano | 44.11918 / 10.80903 | 1794 m | — |
 
@@ -141,6 +139,28 @@ Tutte le soglie numeriche sono in `config.yaml` (sezione `regole`).
   in `errori`. `widget.json` resta sempre valido e completo. Se la generazione fallisce del tutto, il workflow
   non pubblica e restano online i file precedenti.
 
+## Leo previsto (stima indicativa)
+
+Arpae non pubblica previsioni del livello del Leo: il widget mostra una **stima nostra**, per oggi, domani e
+dopodomani, come intervallo del livello massimo atteso. È tarata su un anno di dati (novembre 2025 – novembre 2026,
+livello di Fanano e pioggia di Lago Pratignano, scaricati da Dext3r): dati e script sono in `calibrazione/`.
+
+- **Regola di base:** il Leo sale di circa **0,6 cm per ogni mm di pioggia** a Pratignano. L'intervallo usa i
+  coefficienti 0,49 / 0,61 / 0,72 cm per mm (20°, 50° e 80° percentile degli eventi ≥ 15 mm). Dopo una piena
+  l'eccesso sopra il livello di base scende con una costante di circa 20 ore.
+- **Oggi:** conta soprattutto la **pioggia già caduta** nelle ultime 12 ore, che il fiume può non aver ancora
+  smaltito. Si aggiunge solo la parte della pioggia prevista per oggi che non è ancora caduta.
+- **Domani e dopodomani:** il livello del giorno prima che scende verso la base (minimo delle ultime 72 ore), più
+  l'effetto della **pioggia prevista sui rilievi** (minimo → valore basso, massimo → valore alto). Quando domani
+  diventa oggi, la stima si ricalcola con la pioggia ormai misurata.
+- **Pluviometro:** Pratignano. Nella taratura spiega le piene del Leo molto meglio di Scaffaiolo (correlazione 0,88
+  contro 0,58): Scaffaiolo d'inverno non misura (neve/gelo, 36% di dati mancanti) e parte della pioggia del crinale
+  non arriva al Leo. Scaffaiolo è usato solo se Pratignano non trasmette.
+- **Limiti:** la previsione di pioggia è un totale giornaliero per tutta la montagna modenese, senza orario; nella
+  taratura il Leo non ha mai superato 0,41 m, quindi vicino alla soglia 1 la stima è un'estrapolazione
+  (`leo_prev_oltre_taratura`); neve e variazioni artificiali di portata non sono prevedibili.
+- Parametri in `config.yaml`, sezione `previsione_leo`.
+
 ## Chiavi di widget.json
 
 Tutti i valori sono già formattati (testo), tranne i flag `true`/`false` e `stato_livello`.
@@ -154,7 +174,8 @@ Tutti i valori sono già formattati (testo), tranne i flag `true`/`false` e `sta
 | `leo_livello`, `leo_freccia`, `leo_tendenza`, `leo_delta3h` | `-0.45 m`, `→`, `stabile`, `+0.02 m` | livello e tendenza 3h |
 | `leo_soglia`, `leo_colore`, `leo_soglie` | `normale`, `#0CA30C`, `1.0 / 1.3 / 2.0 m` | stato rispetto alle soglie |
 | `leo_ora`, `leo_vecchio`, `leo_grafico` | `11:30`, `false`, URL | ora dell'ultimo dato, flag, URL del PNG |
-| `panaro_…` | | come `leo_…` |
+| `leo_prev_oggi`, `leo_prev_domani`, `leo_prev_dopodomani` | `-0.16/-0.09 m` | Leo previsto: livello massimo atteso, intervallo basso/alto (stima indicativa) |
+| `leo_prev_oltre_taratura`, `leo_prev_nota` | `false` | stima oltre il campo osservato nella taratura; nota fissa |
 | `pratignano_1h` … `_72h`, `_72h_parziale` | `0.2`, `3.0`, `3.6`, `7.6*` | cumulate in mm (`*` = storico incompleto) |
 | `pratignano_ora`, `pratignano_vecchio` | `11:00`, `false` | ultimo dato orario |
 | `scaffaiolo_…` | | come `pratignano_…` |
@@ -164,7 +185,7 @@ Tutti i valori sono già formattati (testo), tranne i flag `true`/`false` e `sta
 | `allerta_oggi`, `allerta_oggi_colore`, `allerta_oggi_eventi` | `verde`, `#0CA30C`, `""` | allerta zona E1 (colore peggiore, eventi non verdi) |
 | `allerta_domani`, `allerta_domani_colore` | `verde` o `non ancora emessa` | |
 | `allerta_titolo`, `allerta_link`, `allerta_emessa`, `allerta_vecchio` | | documento Arpae |
-| `riga_leo`, `riga_panaro` | `Leo -0.45 m →` | righe pronte (`!` finale = dato vecchio) |
+| `riga_leo` | `Leo -0.45 m →` | righe pronte (`!` finale = dato vecchio) |
 | `riga_pioggia` | `1h/24h mm: Prat. 0.2/3.6 · Scaff. 0.6/3.6` | |
 | `riga_previsione` | `Prev. oggi 4-5 · dom. 0 · 3gg 4-5 mm` | |
 | `riga_allerta`, `riga_aggiornamento` | `Allerta E1: oggi verde · domani verde`, `Agg. 12:10 · Arpae, non validati` | |
@@ -194,7 +215,7 @@ Il widget è un'unica immagine (`widget.png`, o `widget_dark.png` con il tema sc
     documentato ufficialmente: il file ricalca la struttura di preset reali esportati da KWGT (versione 13), ma
     non è stato provato su un telefono.
 
-L'immagine dice tutto quello che serve: stato complessivo, livelli e tendenze di Leo e Panaro con il colore della
+L'immagine dice tutto quello che serve: stato complessivo, livello e tendenza del Leo con il colore della
 soglia, pioggia 1h/24h, previsione, allerta, ora dell'aggiornamento (in rosso se i dati sono vecchi).
 
 ### Avanzato (facoltativo): widget composto da testi
@@ -251,8 +272,8 @@ Se la tua versione non valuta le formule dentro le globali, usa l'URL completo d
 | 3 | Leo: livello e freccia | `$wg(gv(url), json, .riga_leo)$` (oppure `.leo_livello` e `.leo_freccia` separati) |
 | 4 | Leo: pallino (colore) | `$wg(gv(url), json, .leo_colore)$` |
 | 4 | Leo: stato soglia | `$wg(gv(url), json, .leo_soglia)$` |
-| 5 | Panaro: livello e freccia | `$wg(gv(url), json, .riga_panaro)$` |
-| 6 | Panaro: pallino / stato | `$wg(gv(url), json, .panaro_colore)$` · `$wg(gv(url), json, .panaro_soglia)$` |
+| 5 | Leo previsto domani | `$wg(gv(url), json, .leo_prev_domani)$` |
+| 6 | Leo previsto oggi / dopodomani | `$wg(gv(url), json, .leo_prev_oggi)$` · `$wg(gv(url), json, .leo_prev_dopodomani)$` |
 | 7 | pioggia osservata | `$wg(gv(url), json, .riga_pioggia)$` |
 | 8 | pioggia prevista | `$wg(gv(url), json, .riga_previsione)$` |
 | 9 | allerta: pallino / testo | `$wg(gv(url), json, .allerta_oggi_colore)$` · `$wg(gv(url), json, .riga_allerta)$` |
@@ -286,7 +307,7 @@ modulo **Image** a tutta larghezza → proprietà **Bitmap** → passa a **formu
 $if(si(darkmode) = 1, "https://meme190891.github.io/fanano-meteo/leo_dark.png", "https://meme190891.github.io/fanano-meteo/leo.png") + "?t=" + mu(floor, (df(S) - 900) / 1800)$
 ```
 
-Al posto di `leo` puoi mettere `panaro`. `si(darkmode)` vale 1 quando il telefono è in tema scuro.
+`si(darkmode)` vale 1 quando il telefono è in tema scuro.
 
 #### 7. Salva e verifica
 
@@ -369,6 +390,7 @@ fanano/widget_img.py          il widget intero come immagine (widget.png / widge
 fanano/kwgt.py                preset KWGT importabile (Fanano_meteo.kwgt)
 fanano/main.py                esecuzione completa (online o da cartella di risposte salvate)
 fanano/probe.py               diagnostica di raggiungibilità
+calibrazione/                 dati storici Dext3r e script di taratura della stima "Leo previsto"
 tests/                        test (parsing, calcoli, fallback, grafici, config) + fixture Arpae reali
 .github/workflows/aggiorna.yml  pianificato ogni 30': genera e pubblica su gh-pages; keepalive settimanale
 .github/workflows/tests.yml     test a ogni push

@@ -148,6 +148,66 @@ def _vecchio(t: datetime | None, now: datetime, ore: float) -> bool:
 
 # --------------------------------------------------------------------------- aggiornamento stato (fallback)
 
+def previsione_leo(st: dict, cfg: dict, now: datetime) -> list[dict] | None:
+    """Stima indicativa del livello massimo del Leo per oggi, domani, dopodomani (intervallo basso-alto).
+
+    - oggi: risente soprattutto della pioggia gia' caduta (ultime `finestra_osservata_ore`), che puo'
+      non aver ancora raggiunto il fiume; si aggiunge solo la pioggia prevista per oggi non ancora caduta;
+    - domani/dopodomani: partono dal livello del giorno prima che scende verso la base (esaurimento
+      esponenziale con costante tau), piu' l'effetto della pioggia prevista sui rilievi.
+    La salita per mm di pioggia (k) e tau sono tarati sui dati storici (calibrazione/).
+    """
+    import math
+    pc = cfg.get("previsione_leo")
+    if not pc:
+        return None
+    liv = serie_da_stato(st.get("serie", {}).get(f"livello_{pc['torrente']}"))
+    if not liv:
+        return None
+    pio = serie_da_stato(st.get("serie", {}).get(f"pioggia_{pc['pluviometro']}")) or \
+        serie_da_stato(st.get("serie", {}).get(f"pioggia_{pc.get('riserva')}"))
+    t_now, l_now = liv[-1]
+    base = min([v for t, v in liv if t >= t_now - timedelta(hours=pc["base_ore"])] + [l_now])
+    finestra = timedelta(hours=pc["finestra_osservata_ore"])
+    vicini = [(abs((t - (t_now - finestra)).total_seconds()), v) for t, v in liv
+              if abs((t - (t_now - finestra)).total_seconds()) <= 3600]
+    l_start = min(vicini)[1] if vicini else l_now
+    p_oss = sum(v for t, v in pio if t_now - finestra < t <= t_now + timedelta(hours=1))
+    mezzanotte = datetime.combine(now.astimezone(ROME).date(), datetime.min.time(), tzinfo=ROME)
+    caduta_oggi = sum(v for t, v in pio if t > mezzanotte)
+
+    prev = st.get("previsione") or {}
+    per_data = {g["data"]: g for g in prev.get("giorni", []) if g.get("data")}
+    oggi = now.astimezone(ROME).date()
+    giorni_prev = [per_data.get((oggi + timedelta(days=i)).isoformat()) for i in range(3)]
+    decad = math.exp(-24 / pc["tau_ore"])
+
+    out, prec = [], None
+    for i, g in enumerate(giorni_prev):
+        pmin = (g or {}).get("prec_min") or 0.0
+        pmax = (g or {}).get("prec_max") if (g or {}).get("prec_max") is not None else pmin
+        if i == 0:
+            resid_min, resid_max = max(0.0, pmin - caduta_oggi), max(0.0, pmax - caduta_oggi)
+            basso = max(l_now, l_start + pc["k_basso"] * p_oss) + pc["k_basso"] * resid_min
+            alto = max(l_now, l_start + pc["k_alto"] * p_oss) + pc["k_alto"] * resid_max
+        else:
+            ini_b = base + (prec[0] - base) * decad
+            ini_a = base + (prec[1] - base) * decad
+            basso = ini_b + pc["k_basso"] * pmin
+            alto = ini_a + pc["k_alto"] * pmax
+        basso, alto = round(min(basso, alto), 2), round(max(basso, alto), 2)
+        out.append({"data": (oggi + timedelta(days=i)).isoformat(), "basso": basso, "alto": alto,
+                    "pioggia_prevista": g is not None, "oltre_taratura": alto > pc["max_tarato_m"]})
+        prec = (basso, alto)
+    out[0]["pioggia_osservata_mm"] = round(p_oss, 1)
+    return out
+
+
+def fmt_range_m(basso: float, alto: float) -> str:
+    f = lambda x: f"{x:.2f}".replace("-0.00", "0.00")
+    return f"{f(basso)} m" if abs(alto - basso) < 0.005 else f"{f(basso)}/{f(alto)} m"
+
+
 def stato_vuoto() -> dict:
     return {"versione": VERSIONE_STATO, "aggiornato": None, "serie": {}, "idrometri": {},
             "allerte": {}, "previsione": None, "fonti": {}}
@@ -371,6 +431,13 @@ def costruisci_widget(st: dict, cfg: dict, now: datetime, errori: list[str] | No
     w["stato_livello"] = livello
     w["stato_colore"] = col[LIVELLO_COLORE[livello]]
     w["dato_vecchio"] = any(vecchi.values())
+
+    # ---- Leo previsto (stima indicativa, non Arpae)
+    lp = previsione_leo(st, cfg, now)
+    for nome_g, i in (("oggi", 0), ("domani", 1), ("dopodomani", 2)):
+        w[f"leo_prev_{nome_g}"] = fmt_range_m(lp[i]["basso"], lp[i]["alto"]) if lp else "n.d."
+    w["leo_prev_oltre_taratura"] = bool(lp and any(x["oltre_taratura"] for x in lp))
+    w["leo_prev_nota"] = "stima indicativa (pioggia osservata + previsione Arpae), non ufficiale"
 
     # ---- righe gia' composte per il widget (una formula KWGT per riga)
     for t in cfg["torrenti"]:

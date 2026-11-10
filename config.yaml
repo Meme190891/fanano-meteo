@@ -28,12 +28,6 @@ torrenti:
     id: "5503"
     corso_acqua: "T. Leo"
     pluviometri: [pratignano, scaffaiolo]
-  - chiave: panaro
-    nome: "Panaro a P.te Val di Sasso"
-    nome_breve: "Panaro"
-    id: "5434"
-    corso_acqua: "F. Panaro"
-    pluviometri: [pratignano, scaffaiolo]
 
 nota_torrenti: "Ospitale e Fellicarolo: nessun idrometro Arpae"
 
@@ -49,6 +43,21 @@ pluviometri:
     nome_breve: "Scaffaiolo"
     sigla: "Scaff."          # usata nelle righe compatte del widget
     id: "12461"
+
+# Stima indicativa del livello del Leo per oggi, domani, dopodomani (vedi README, "Leo previsto").
+# Coefficienti tarati su nov 2025 - nov 2026 (livello Fanano 5503 e pioggia Lago Pratignano, dati Dext3r):
+# script e dati in calibrazione/.
+previsione_leo:
+  torrente: leo
+  pluviometro: pratignano        # pioggia usata nella taratura
+  riserva: scaffaiolo            # usata solo se manca la serie di Pratignano
+  k_basso: 0.0049                # salita del Leo in metri per mm di pioggia (20o percentile)
+  k_centrale: 0.0061             # mediana
+  k_alto: 0.0072                 # 80o percentile
+  tau_ore: 20                    # esaurimento: l'eccesso sopra la base si riduce di e ogni 20 ore
+  finestra_osservata_ore: 12     # pioggia gia' caduta che puo' non aver ancora raggiunto il fiume
+  base_ore: 72                   # livello di base = minimo delle ultime 72 ore
+  max_tarato_m: 0.45             # livello massimo osservato nella taratura (0.41 m): oltre, stima meno affidabile
 
 # Regole di calcolo (vedi README, sezione "Regole")
 regole:

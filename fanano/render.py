@@ -365,6 +365,19 @@ def pagina_index(st: dict, cfg: dict, widget: dict, now: datetime) -> str:
 {''.join(figure)}
 <p class="sub">{_e(w['nota_torrenti'])}.</p>
 
+<h2>Leo previsto</h2>
+<div class="card scroll"><table>
+<thead><tr><th>Giorno</th><th>Livello massimo atteso</th><th>Pioggia prevista (rilievi)</th></tr></thead>
+<tbody>
+<tr><td>oggi</td><td class="nw">{_e(w.get('leo_prev_oggi', 'n.d.').replace('-', '−'))}</td><td>{_e(w['prev_oggi'])}</td></tr>
+<tr><td>domani</td><td class="nw">{_e(w.get('leo_prev_domani', 'n.d.').replace('-', '−'))}</td><td>{_e(w['prev_domani'])}</td></tr>
+<tr><td>dopodomani</td><td class="nw">{_e(w.get('leo_prev_dopodomani', 'n.d.').replace('-', '−'))}</td><td>{_e(w['prev_dopodomani'])}</td></tr>
+</tbody></table>
+<p class="sub">Stima indicativa, non Arpae. Oggi conta soprattutto la pioggia già caduta a Pratignano che il fiume
+non ha ancora smaltito; domani e dopodomani il livello attuale che scende e la pioggia prevista sui rilievi.
+Regola tarata su un anno di dati (circa +0,6 cm di livello per mm di pioggia).
+{'<strong>Valori oltre quelli osservati nella taratura: stima poco affidabile.</strong>' if w.get('leo_prev_oltre_taratura') else ''}</p></div>
+
 <h2>Valori</h2>
 <div class="card scroll"><table>
 <thead><tr><th>Torrente</th><th>Livello</th><th>Tendenza 3h</th><th>Stato</th></tr></thead>

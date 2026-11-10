@@ -148,6 +148,11 @@ def disegna(widget: dict, cfg: dict, tema: str, path: Path, stato: dict | None =
         stato_s = w[f"{k}_soglia"] + (" · vecchio" if w[f"{k}_vecchio"] else "")
         t.testo(MARGINE_X + 620, y, stato_s, 36, c["ink2"], max_w=destra - (MARGINE_X + 620))
         y += 58
+    if len(cfg["torrenti"]) < 2 and w.get("leo_prev_domani"):   # riga libera: stima del Leo
+        t.testo(MARGINE_X, y, "Previsto", 32, c["ink2"], "bold", max_w=250)
+        t.testo(MARGINE_X + 200, y, f"oggi {w['leo_prev_oggi']} · dom. {w['leo_prev_domani']}".replace("-", "−"),
+                32, c["ink2"], max_w=destra - MARGINE_X - 200)
+        y += 58
     t.linea(y - 36)
 
     # due grafici affiancati: pioggia oraria ultime 24 h, stessa scala
@@ -282,6 +287,59 @@ def _grafico_previsione(t: "_Tela", x0, y_base, larg, alt, giorni, c):
         t.testo(x0 + larg / 2, y_base - alt / 2 - 10, "nessuna pioggia prevista", 28, c["muted"], ancora="ms")
 
 
+def compute_previsione(stato, cfg, now):
+    from fanano.compute import previsione_leo
+    return previsione_leo(stato, cfg, now) if stato else None
+
+
+def _grafico_leo_previsto(t: "_Tela", x0, y_base, larg, alt, prev, giorni, w, cfg, c):
+    """Tre barre 'flottanti' (da livello basso ad alto) per oggi, domani, dopodomani, con soglia 1 se vicina."""
+    t.d.line((x0 * SCALA, y_base * SCALA, (x0 + larg) * SCALA, y_base * SCALA), fill=c["griglia"], width=2 * SCALA)
+    slot = larg / 3
+    for i, (etichetta, _, _) in enumerate(giorni):
+        t.testo(x0 + i * slot + slot / 2, y_base + 34, etichetta, 26, c["ink2"], ancora="ms")
+    if not prev:
+        t.testo(x0 + larg / 2, y_base - alt / 2, "stima non disponibile", 26, c["muted"], ancora="ms")
+        return
+    tor = cfg["torrenti"][0]
+    s1 = None
+    try:
+        s1 = float(w.get(f"{tor['chiave']}_soglie", "").split("/")[0])
+    except ValueError:
+        pass
+    lo = min(x["basso"] for x in prev) - 0.08
+    hi = max(x["alto"] for x in prev) + 0.08
+    if hi - lo < 0.4:
+        m = (hi + lo) / 2; lo, hi = m - 0.2, m + 0.2
+    mostra_s1 = s1 is not None and s1 <= hi + 0.25
+    if mostra_s1:
+        hi = max(hi, s1 + 0.05)
+    y = lambda v: y_base - alt * (v - lo) / (hi - lo)
+    if mostra_s1:
+        ys = y(s1)
+        x = x0
+        while x < x0 + larg:                                   # linea tratteggiata gialla della soglia 1
+            t.d.line((x * SCALA, ys * SCALA, min(x + 14, x0 + larg) * SCALA, ys * SCALA), fill=(250, 178, 25, 255),
+                     width=3 * SCALA)
+            x += 24
+        t.testo(x0 + larg, ys - 6, f"soglia 1 · {s1:.1f} m", 20, c["muted"], ancora="rs")
+    else:
+        t.testo(x0 + larg, y_base - alt - 4, f"soglia 1 a {s1:.1f} m: lontana" if s1 else "", 20, c["muted"],
+                ancora="rs")
+    barra = min(70.0, slot * 0.42)
+    for i, x in enumerate(prev):
+        cx = x0 + i * slot + slot / 2
+        yt_, yb_ = y(x["alto"]), y(x["basso"])
+        if yb_ - yt_ < 8:
+            yt_, yb_ = (yt_ + yb_) / 2 - 4, (yt_ + yb_) / 2 + 4
+        col = ROSSO if (s1 and x["alto"] >= s1) else c["barre"]
+        t.d.rounded_rectangle(((cx - barra / 2) * SCALA, yt_ * SCALA, (cx + barra / 2) * SCALA, yb_ * SCALA),
+                              radius=5 * SCALA, fill=col)
+        f = lambda v: f"{v:.2f}".replace("-", "−")
+        txt = f(x["alto"]) if abs(x["alto"] - x["basso"]) < 0.005 else f"{f(x['basso'])}/{f(x['alto'])}"
+        t.testo(cx, yt_ - 8, txt, 22, c["ink"], "bold", ancora="ms")
+
+
 def disegna43(widget: dict, cfg: dict, tema: str, path: Path, stato: dict | None = None,
               now: datetime | None = None) -> Path:
     """Widget 4x3: pioggia osservata in primo piano, torrenti e previsione (a grafico) sotto."""
@@ -325,8 +383,8 @@ def disegna43(widget: dict, cfg: dict, tema: str, path: Path, stato: dict | None
     # in basso a sinistra: torrenti; in basso a destra: previsione a grafico
     y0 = y_base + 86
     x_dx = MARGINE_X + 560
-    yt = y0 + 70
-    for tor in cfg["torrenti"]:
+    yt = y0 + 62
+    for tor in cfg["torrenti"][:1]:                    # solo il primo torrente (Leo): il resto e' la stima
         k = tor["chiave"]
         t.testo(MARGINE_X, yt, tor.get("nome_breve", tor["nome"]), 38, c["ink"], "bold", max_w=170)
         t.testo(MARGINE_X + 330, yt, w[f"{k}_livello"].replace("-", "−"), 38, c["ink"], ancora="rs")
@@ -334,8 +392,9 @@ def disegna43(widget: dict, cfg: dict, tema: str, path: Path, stato: dict | None
         t.pallino(MARGINE_X + 412, yt - 12, 12, _hex(w[f"{k}_colore"]))
         t.testo(MARGINE_X + 434, yt, w[f"{k}_soglia"] + (" !" if w[f"{k}_vecchio"] else ""), 26, c["ink2"],
                 max_w=x_dx - MARGINE_X - 434 - 16)
-        yt += 62
-    t.testo(MARGINE_X, yt - 8, "livello attuale · tendenza 3 h", 22, c["muted"])
+    t.testo(MARGINE_X, yt + 38, "Leo previsto (stima indicativa)", 26, c["ink2"], "bold", max_w=x_dx - MARGINE_X - 40)
+    _grafico_leo_previsto(t, MARGINE_X, H43 - MARGINE_Y - 74, x_dx - MARGINE_X - 40, 110,
+                          compute_previsione(stato, cfg, now), _giorni_previsione(stato, now), w, cfg, c)
 
     t.testo(x_dx, y0 + 38, f"Pioggia prevista ({w.get('prev_zona', 'rilievi')})", 26, c["ink2"], "bold",
             max_w=destra - x_dx)
