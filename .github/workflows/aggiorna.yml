@@ -55,7 +55,7 @@ jobs:
           for k in ("aggiornato", "stato", "leo_livello", "disclaimer"):
               assert k in w, k
           print(f"{w['aggiornato']} | {w['stato']} | Leo {w['leo_livello']} ({w['leo_ora']}) | "
-                f"Panaro {w['panaro_livello']} | errori: {w['errori'] or '-'}")
+                f"Leo previsto domani {w.get('leo_prev_domani', 'n.d.')} | errori: {w['errori'] or '-'}")
           EOF
           cp DATA-LICENSE public/LICENZA-DATI.txt
           touch public/.nojekyll
