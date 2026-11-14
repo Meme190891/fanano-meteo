@@ -45,19 +45,21 @@ pluviometri:
     id: "12461"
 
 # Stima indicativa del livello del Leo per oggi, domani, dopodomani (vedi README, "Leo previsto").
-# Coefficienti tarati su nov 2025 - nov 2026 (livello Fanano 5503 e pioggia Lago Pratignano, dati Dext3r):
-# script e dati in calibrazione/.
+# Coefficienti tarati su due anni, nov 2024 - nov 2026 (livello Fanano 5503, pioggia Lago Pratignano e
+# Lago Scaffaiolo, dati Dext3r) con verifica incrociata tra i due anni: script e dati in calibrazione/.
 previsione_leo:
   torrente: leo
-  pluviometro: pratignano        # pioggia usata nella taratura
-  riserva: scaffaiolo            # usata solo se manca la serie di Pratignano
-  k_basso: 0.0049                # salita del Leo in metri per mm di pioggia (20o percentile)
-  k_centrale: 0.0061             # mediana
-  k_alto: 0.0072                 # 80o percentile
-  tau_ore: 20                    # esaurimento: l'eccesso sopra la base si riduce di e ogni 20 ore
+  pluviometro: pratignano        # stazione principale (piu' precisa sulle piene normali)
+  crinale: scaffaiolo            # usata per il limite alto: le piene grandi arrivano con pioggia forte sul crinale
+  rapporto_crinale: 2.31         # pioggia Scaffaiolo / Pratignano (mediana): serve se Pratignano non trasmette
+  k_basso: 0.0035                # salita del Leo in metri per mm a Pratignano (20o percentile)
+  k_centrale: 0.0062             # mediana
+  k_alto: 0.0086                 # 80o percentile
+  k_crinale_alto: 0.0062         # metri per mm a Scaffaiolo (80o percentile), solo per il limite alto
+  tau_ore: 20                    # esaurimento: l'eccesso sopra la base si riduce di e ogni ~20 ore
   finestra_osservata_ore: 12     # pioggia gia' caduta che puo' non aver ancora raggiunto il fiume
   base_ore: 72                   # livello di base = minimo delle ultime 72 ore
-  max_tarato_m: 0.45             # livello massimo osservato nella taratura (0.41 m): oltre, stima meno affidabile
+  max_tarato_m: 1.0              # livello massimo osservato nella taratura (0.98 m, 23/10/2025)
 
 # Regole di calcolo (vedi README, sezione "Regole")
 regole:

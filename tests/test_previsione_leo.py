@@ -65,3 +65,33 @@ def test_widget_e_dati_mancanti(stato, cfgp, cfg):
 def test_fmt_range_m():
     assert compute.fmt_range_m(-0.16, -0.09) == "-0.16/-0.09 m"
     assert compute.fmt_range_m(-0.45, -0.45) == "-0.45 m"
+
+
+def test_pioggia_forte_sul_crinale_alza_il_limite_alto(stato, cfgp):
+    prev_pioggia(stato, [(0, 0), (0, 0), (0, 0)])
+    for p in stato["serie"]["pioggia_pratignano"][-6:]:
+        p[1] = 5.0                                           # 30 mm a Pratignano
+    solo_prat = compute.previsione_leo(stato, cfgp, NOW)[0]
+    for p in stato["serie"]["pioggia_scaffaiolo"][-6:]:
+        p[1] = 25.0                                          # 150 mm sul crinale
+    lp = compute.previsione_leo(stato, cfgp, NOW)[0]
+    assert lp["crinale_usato"] and lp["alto"] > solo_prat["alto"] + 0.3
+    assert lp["basso"] == solo_prat["basso"]                 # il valore basso resta su Pratignano
+
+
+def test_crinale_guasto_ignorato(stato, cfgp):
+    prev_pioggia(stato, [(0, 0), (0, 0), (0, 0)])
+    for p in stato["serie"]["pioggia_pratignano"][-6:]:
+        p[1] = 5.0
+    for p in stato["serie"]["pioggia_scaffaiolo"][-12:]:
+        p[1] = 0.0                                           # crinale a zero con 30 mm a Pratignano: non affidabile
+    assert compute.previsione_leo(stato, cfgp, NOW)[0]["crinale_usato"] is False
+
+
+def test_pratignano_assente_usa_crinale_in_scala(stato, cfgp):
+    prev_pioggia(stato, [(0, 0), (0, 0), (0, 0)])
+    for p in stato["serie"]["pioggia_scaffaiolo"][-6:]:
+        p[1] = 10.0                                          # 60 mm sul crinale
+    stato["serie"]["pioggia_pratignano"] = []
+    lp = compute.previsione_leo(stato, cfgp, NOW)[0]
+    assert lp["pioggia_osservata_mm"] == pytest.approx(60 / PREV["rapporto_crinale"], abs=0.2)

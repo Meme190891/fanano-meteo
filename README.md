@@ -142,24 +142,33 @@ Tutte le soglie numeriche sono in `config.yaml` (sezione `regole`).
 ## Leo previsto (stima indicativa)
 
 Arpae non pubblica previsioni del livello del Leo: il widget mostra una **stima nostra**, per oggi, domani e
-dopodomani, come intervallo del livello massimo atteso. È tarata su un anno di dati (novembre 2025 – novembre 2026,
-livello di Fanano e pioggia di Lago Pratignano, scaricati da Dext3r): dati e script sono in `calibrazione/`.
+dopodomani, come intervallo del livello massimo atteso. È tarata su **due anni** di dati (novembre 2024 –
+novembre 2026: livello di Fanano, pioggia di Lago Pratignano e Lago Scaffaiolo, da Dext3r), con verifica
+incrociata (tarata su un anno e provata sull'altro). Dati e script sono in `calibrazione/`.
 
-- **Regola di base:** il Leo sale di circa **0,6 cm per ogni mm di pioggia** a Pratignano. L'intervallo usa i
-  coefficienti 0,49 / 0,61 / 0,72 cm per mm (20°, 50° e 80° percentile degli eventi ≥ 15 mm). Dopo una piena
-  l'eccesso sopra il livello di base scende con una costante di circa 20 ore.
+- **Regola di base:** il Leo sale di circa **0,6 cm per ogni mm di pioggia a Pratignano** (intervallo 0,35 – 0,86
+  cm per mm, 20°–80° percentile degli eventi ≥ 15 mm). Dopo una piena l'eccesso sopra il livello di base scende con
+  una costante di circa 20 ore.
+- **Piene grandi e crinale:** le due piene maggiori dei due anni (+1,26 m il 27/01/2025, +1,61 m fino a 0,98 m il
+  20/10/2025) sono arrivate con pioggia molto forte sul crinale (219 e 324 mm a Scaffaiolo) e la sola Pratignano le
+  sottostimava. Per questo il **valore alto** dell'intervallo è il maggiore tra la stima di Pratignano e quella di
+  Scaffaiolo (0,62 cm per mm di pioggia a Scaffaiolo), quando Scaffaiolo funziona. Nella verifica incrociata
+  l'intervallo contiene la piena reale nel 78-82% dei casi (contro il 52-82% con la sola Pratignano), incluse le due
+  piene maggiori; il valore alto è prudente (in media ~14 cm sopra il reale).
 - **Oggi:** conta soprattutto la **pioggia già caduta** nelle ultime 12 ore, che il fiume può non aver ancora
-  smaltito. Si aggiunge solo la parte della pioggia prevista per oggi che non è ancora caduta.
+  smaltito; si aggiunge solo la pioggia prevista per oggi non ancora caduta.
 - **Domani e dopodomani:** il livello del giorno prima che scende verso la base (minimo delle ultime 72 ore), più
   l'effetto della **pioggia prevista sui rilievi** (minimo → valore basso, massimo → valore alto). Quando domani
   diventa oggi, la stima si ricalcola con la pioggia ormai misurata.
-- **Pluviometro:** Pratignano. Nella taratura spiega le piene del Leo molto meglio di Scaffaiolo (correlazione 0,88
-  contro 0,58): Scaffaiolo d'inverno non misura (neve/gelo, 36% di dati mancanti) e parte della pioggia del crinale
-  non arriva al Leo. Scaffaiolo è usato solo se Pratignano non trasmette.
-- **Limiti:** la previsione di pioggia è un totale giornaliero per tutta la montagna modenese, senza orario; nella
-  taratura il Leo non ha mai superato 0,41 m, quindi vicino alla soglia 1 la stima è un'estrapolazione
+- **Pluviometri:** Pratignano è la stazione principale (la più precisa sulle piene normali). Scaffaiolo serve per il
+  limite alto ed è ignorato quando sembra guasto (≈ 0 mentre Pratignano registra pioggia forte: nell'inverno
+  2025-26 non ha misurato per mesi). Se Pratignano non trasmette si usa Scaffaiolo diviso 2,31 (sul crinale piove
+  in media 2,3 volte di più).
+- **Limiti:** la previsione di pioggia è un totale giornaliero per tutta la montagna modenese, senza orario; nei due
+  anni il Leo ha raggiunto al massimo 0,98 m, quindi oltre la soglia 1 la stima è un'estrapolazione
   (`leo_prev_oltre_taratura`); neve e variazioni artificiali di portata non sono prevedibili.
-- Parametri in `config.yaml`, sezione `previsione_leo`.
+- Parametri in `config.yaml`, sezione `previsione_leo`. Con nuovi dati la taratura si rifà con lo script in
+  `calibrazione/` (vedi `calibrazione/LEGGIMI.md`).
 
 ## Chiavi di widget.json
 
