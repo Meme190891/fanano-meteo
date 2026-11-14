@@ -168,6 +168,8 @@ def previsione_leo(st: dict, cfg: dict, now: datetime) -> list[dict] | None:
     finestra = timedelta(hours=pc["finestra_osservata_ore"])
     pio = serie_da_stato(st.get("serie", {}).get(f"pioggia_{pc['pluviometro']}"))
     cri = serie_da_stato(st.get("serie", {}).get(f"pioggia_{pc.get('crinale')}")) if pc.get("crinale") else []
+    if cri and t_now - cri[-1][0] > timedelta(hours=2):    # crinale che non trasmette: dati non usabili
+        cri = []
     somma = lambda serie, da: sum(v for t, v in serie if da < t <= t_now + timedelta(hours=1))
     p_cri = somma(cri, t_now - finestra) if cri else None
     if not pio and cri:                       # Pratignano non trasmette: crinale riportato in scala
@@ -179,6 +181,9 @@ def previsione_leo(st: dict, cfg: dict, now: datetime) -> list[dict] | None:
     vicini = [(abs((t - (t_now - finestra)).total_seconds()), v) for t, v in liv
               if abs((t - (t_now - finestra)).total_seconds()) <= 3600]
     l_start = min(vicini)[1] if vicini else l_now
+    # salita gia' avvenuta dall'inizio della finestra: la pioggia caduta ne ha gia' prodotta una parte
+    gia_salito = max(0.0, max([v for t, v in liv if t >= t_now - finestra] + [l_now]) - l_start)
+    in_arrivo = lambda k, mm: max(0.0, k * mm - gia_salito)
     mezzanotte = datetime.combine(now.astimezone(ROME).date(), datetime.min.time(), tzinfo=ROME)
     caduta_oggi = sum(v for t, v in pio if t > mezzanotte)
 
@@ -194,11 +199,11 @@ def previsione_leo(st: dict, cfg: dict, now: datetime) -> list[dict] | None:
         pmax = (g or {}).get("prec_max") if (g or {}).get("prec_max") is not None else pmin
         if i == 0:
             resid_min, resid_max = max(0.0, pmin - caduta_oggi), max(0.0, pmax - caduta_oggi)
-            basso = max(l_now, l_start + pc["k_basso"] * p_oss) + pc["k_basso"] * resid_min
-            picco_alto = l_start + pc["k_alto"] * p_oss
+            basso = l_now + in_arrivo(pc["k_basso"], p_oss) + pc["k_basso"] * resid_min
+            salita_alta = in_arrivo(pc["k_alto"], p_oss)
             if crinale_ok and pc.get("k_crinale_alto"):       # pioggia forte sul crinale: piene piu' grandi
-                picco_alto = max(picco_alto, l_start + pc["k_crinale_alto"] * p_cri)
-            alto = max(l_now, picco_alto) + pc["k_alto"] * resid_max
+                salita_alta = max(salita_alta, in_arrivo(pc["k_crinale_alto"], p_cri))
+            alto = l_now + salita_alta + pc["k_alto"] * resid_max
         else:
             ini_b = base + (prec[0] - base) * decad
             ini_a = base + (prec[1] - base) * decad

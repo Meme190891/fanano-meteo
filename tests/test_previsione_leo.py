@@ -95,3 +95,22 @@ def test_pratignano_assente_usa_crinale_in_scala(stato, cfgp):
     stato["serie"]["pioggia_pratignano"] = []
     lp = compute.previsione_leo(stato, cfgp, NOW)[0]
     assert lp["pioggia_osservata_mm"] == pytest.approx(60 / PREV["rapporto_crinale"], abs=0.2)
+
+
+def test_fiume_in_discesa_senza_pioggia_non_risale(stato, cfgp):
+    prev_pioggia(stato, [(0, 0), (0, 0), (0, 0)])
+    serie = stato["serie"]["livello_leo"]
+    for i, p in enumerate(serie[-48:]):                     # da +0.10 a -0.28 nelle ultime 12 ore
+        p[1] = round(0.10 - 0.38 * i / 47, 2)
+    for p in stato["serie"]["pioggia_pratignano"][-12:]:
+        p[1] = 0.2                                           # pioggerella: 2.4 mm
+    lp = compute.previsione_leo(stato, cfgp, NOW)
+    assert lp[0]["alto"] <= -0.28 + 0.03                     # oggi resta intorno al livello attuale
+
+
+def test_crinale_non_aggiornato_ignorato(stato, cfgp):
+    prev_pioggia(stato, [(0, 0), (0, 0), (0, 0)])
+    stato["serie"]["pioggia_scaffaiolo"] = stato["serie"]["pioggia_scaffaiolo"][:-6]    # fermo da 6 ore
+    for p in stato["serie"]["pioggia_scaffaiolo"][-6:]:
+        p[1] = 30.0
+    assert compute.previsione_leo(stato, cfgp, NOW)[0]["crinale_usato"] is False
