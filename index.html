@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fanano meteo-idro</title>
+<meta name="description" content="Livelli di Leo e Panaro, pioggia osservata e prevista a Fanano (dati Arpae)">
+<style>
+:root{color-scheme:light;--surface:#fcfcfb;--page:#f9f9f7;--ink:#0b0b0b;--ink2:#52514e;--muted:#6f6e69;
+--rule:#e1e0d9;--link:#1c5cab}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--surface:#1a1a19;--page:#0d0d0d;--ink:#f0efec;
+--ink2:#c3c2b7;--muted:#a3a29b;--rule:#2c2c2a;--link:#86b6ef}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:1.35rem;margin:.2rem 0 .1rem}
+h2{font-size:1.05rem;margin:1.6rem 0 .5rem}
+p{margin:.3rem 0}
+.sub{color:var(--ink2);font-size:.9rem}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin:12px 0}
+.stato{display:flex;gap:10px;align-items:flex-start;font-weight:600;font-size:1.1rem}
+.dot{display:inline-block;width:.8em;height:.8em;border-radius:50%;flex:none;margin-top:.3em}
+.inline-dot{display:inline-block;width:.65em;height:.65em;border-radius:50%;margin-right:.35em;vertical-align:baseline}
+img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--rule)}
+table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--ink2);font-weight:600}
+.scroll{overflow-x:auto}
+details summary{cursor:pointer;color:var(--ink2);margin:.4rem 0}
+a{color:var(--link)}
+footer{color:var(--muted);font-size:.82rem;margin:2rem 0 1rem}
+small{color:var(--ink2);font-size:.8rem}
+.nw{white-space:nowrap}
+.fig{display:block;margin:14px 0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style></head>
+<body><main>
+<h1>Fanano · torrenti e pioggia</h1>
+<p class="sub">Aggiornato 14/11 16:41 · Dati Arpae in tempo reale, non validati</p>
+<p><a href="kwgt.html">📲 Aggiungi il widget al telefono</a></p>
+<div class="card"><div class="stato"><span class="dot" style="background:#FAB219" aria-hidden="true"></span><span>Attenzione: Allerta gialla zona E1 · alcuni dati vecchi</span></div>
+<p class="sub">Allerta gialla zona E1; Pioggia abbondante ultime 24h (Scaffaiolo 194 mm)</p>
+<p class="sub">Fonti non raggiunte in questo aggiornamento: pioggia_scaffaiolo: ValueError</p>
+</div>
+<h2 class="sr">Leo a Fanano</h2><picture class="fig"><source srcset="leo_dark.png?v=202611141541" media="(prefers-color-scheme: dark)"><img src="leo.png?v=202611141541" width="1080" height="1330" alt="Grafico Leo a Fanano: livello ultime 72 ore con soglie, e pioggia oraria a Lago Pratignano e Lago Scaffaiolo. Valori nelle tabelle."></picture>
+<p class="sub">Ospitale e Fellicarolo: nessun idrometro Arpae.</p>
+
+<h2>Leo previsto</h2>
+<div class="card scroll"><table>
+<thead><tr><th>Giorno</th><th>Livello massimo atteso</th><th>Pioggia prevista (rilievi)</th></tr></thead>
+<tbody>
+<tr><td>oggi</td><td class="nw">−0.11/−0.10 m</td><td>0-2 mm</td></tr>
+<tr><td>domani</td><td class="nw">−0.20/−0.16 m</td><td>4-8 mm</td></tr>
+<tr><td>dopodomani</td><td class="nw">−0.23/−0.19 m</td><td>3-7 mm</td></tr>
+</tbody></table>
+<p class="sub">Stima indicativa, non Arpae. Oggi conta soprattutto la pioggia già caduta a Pratignano che il fiume
+non ha ancora smaltito; domani e dopodomani il livello attuale che scende e la pioggia prevista sui rilievi.
+Regola tarata su un anno di dati (circa +0,6 cm di livello per mm di pioggia).
+</p></div>
+
+<h2>Valori</h2>
+<div class="card scroll"><table>
+<thead><tr><th>Torrente</th><th>Livello</th><th>Tendenza 3h</th><th>Stato</th></tr></thead>
+<tbody><tr><td>Leo a Fanano<br><small>dato 16:00</small></td><td class="nw">−0.26 m</td><td class="nw">→ stabile<br><small>−0.02 m</small></td><td class="nw"><span class="inline-dot" style="background:#0CA30C" aria-hidden="true"></span>normale</td></tr></tbody></table></div>
+<div class="card scroll"><table>
+<thead><tr><th>Pioggia (mm)</th><th>1h</th><th>6h</th><th>24h</th><th>72h</th><th>Dato</th></tr></thead>
+<tbody><tr><td>Lago Pratignano</td><td>0.0</td><td>0.0</td><td>5.0</td><td>225.1</td><td>16:00</td></tr><tr><td>Lago Scaffaiolo</td><td>10.9</td><td>32.8</td><td>193.9</td><td>491.8*</td><td>13/11 08:00 · vecchio</td></tr></tbody></table>
+<p class="sub">* storico incompleto: valore calcolato sulle ore disponibili.</p></div>
+<div class="card">
+<p><strong>Previsione</strong> (Arpae, MO rilievi): oggi 0-2 mm · domani 4-8 mm
+· dopodomani 3-7 mm · 3 giorni 7-17 mm</p>
+<p class="sub">Al mattino in pianura molto nuvoloso con piogge deboli intermittenti, sui rilievi molto nuvoloso con deboli…</p>
+<p><strong>Allerta zona E1</strong>: oggi <span class="inline-dot" style="background:#FAB219" aria-hidden="true"></span>gialla
+(idrogeologica gialla)
+· domani <span class="inline-dot" style="background:#FAB219" aria-hidden="true"></span>gialla</p>
+<p class="sub">Allerta 109/2026 valida dalle 00:00 del 14/11/2026: piene dei fiumi, frane e piene dei corsi minori · <a href="https://allertameteo.regione.emilia-romagna.it/documents/20181/4963941/allerta109_2026.pdf">documento PDF</a></p>
+</div>
+<details><summary>Dati delle ultime 24 ore (tabella)</summary>
+<div class="card scroll"><table>
+<thead><tr><th>Ora</th><th>Leo (m)</th><th>Pratignano (mm)</th><th>Scaffaiolo (mm)</th></tr></thead>
+<tbody><tr><td>14/11 16:00</td><td>-0.26</td><td>0.0</td><td>–</td></tr><tr><td>14/11 15:00</td><td>-0.25</td><td>0.0</td><td>–</td></tr><tr><td>14/11 14:00</td><td>-0.26</td><td>0.0</td><td>–</td></tr><tr><td>14/11 13:00</td><td>-0.24</td><td>0.0</td><td>–</td></tr><tr><td>14/11 12:00</td><td>-0.24</td><td>0.0</td><td>–</td></tr><tr><td>14/11 11:00</td><td>-0.22</td><td>0.0</td><td>–</td></tr><tr><td>14/11 10:00</td><td>-0.19</td><td>0.0</td><td>–</td></tr><tr><td>14/11 09:00</td><td>-0.17</td><td>0.0</td><td>–</td></tr><tr><td>14/11 08:00</td><td>-0.17</td><td>0.0</td><td>–</td></tr><tr><td>14/11 07:00</td><td>-0.12</td><td>0.0</td><td>–</td></tr><tr><td>14/11 06:00</td><td>-0.12</td><td>0.0</td><td>–</td></tr><tr><td>14/11 05:00</td><td>-0.09</td><td>0.0</td><td>–</td></tr><tr><td>14/11 04:00</td><td>-0.11</td><td>0.0</td><td>–</td></tr><tr><td>14/11 03:00</td><td>-0.08</td><td>0.0</td><td>–</td></tr><tr><td>14/11 02:00</td><td>-0.07</td><td>0.0</td><td>–</td></tr><tr><td>14/11 01:00</td><td>-0.06</td><td>0.0</td><td>–</td></tr><tr><td>14/11 00:00</td><td>-0.02</td><td>0.0</td><td>–</td></tr><tr><td>13/11 23:00</td><td>0.01</td><td>0.0</td><td>–</td></tr><tr><td>13/11 22:00</td><td>0.03</td><td>0.2</td><td>–</td></tr><tr><td>13/11 21:00</td><td>0.08</td><td>0.0</td><td>–</td></tr><tr><td>13/11 20:00</td><td>0.09</td><td>0.2</td><td>–</td></tr><tr><td>13/11 19:00</td><td>0.13</td><td>3.6</td><td>–</td></tr><tr><td>13/11 18:00</td><td>0.18</td><td>0.8</td><td>–</td></tr><tr><td>13/11 17:00</td><td>0.21</td><td>0.2</td><td>–</td></tr></tbody></table></div></details>
+
+<h2>Link</h2>
+<p><a href="https://allertameteo.regione.emilia-romagna.it/livello-idrometrico">Mappa livelli idrometrici Arpae</a> ·
+<a href="https://allertameteo.regione.emilia-romagna.it/web/fanano/home">Allerte per il comune di Fanano</a> ·
+<a href="https://allertameteo.regione.emilia-romagna.it/previsioni-regionali">Previsioni regionali</a> ·
+<a href="widget.json">widget.json</a></p>
+<footer>Dati Arpae in tempo reale, non validati. Fonte: <a href="https://allertameteo.regione.emilia-romagna.it/">Allerta Meteo Emilia-Romagna</a>
+(Arpae Emilia-Romagna e Agenzia per la sicurezza territoriale e la protezione civile),
+licenza <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.
+Elaborazione non ufficiale per uso personale: per decisioni di sicurezza fare riferimento ai canali ufficiali.</footer>
+</main></body></html>

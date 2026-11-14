@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Widget Fanano</title>
+<meta name="description" content="Come aggiungere il widget meteo-idrologico di Fanano al telefono con KWGT">
+<style>
+:root{color-scheme:light;--surface:#fcfcfb;--page:#f9f9f7;--ink:#0b0b0b;--ink2:#52514e;--muted:#6f6e69;
+--rule:#e1e0d9;--link:#1c5cab}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--surface:#1a1a19;--page:#0d0d0d;--ink:#f0efec;
+--ink2:#c3c2b7;--muted:#a3a29b;--rule:#2c2c2a;--link:#86b6ef}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:1.35rem;margin:.2rem 0 .1rem}
+h2{font-size:1.05rem;margin:1.6rem 0 .5rem}
+p{margin:.3rem 0}
+.sub{color:var(--ink2);font-size:.9rem}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin:12px 0}
+.stato{display:flex;gap:10px;align-items:flex-start;font-weight:600;font-size:1.1rem}
+.dot{display:inline-block;width:.8em;height:.8em;border-radius:50%;flex:none;margin-top:.3em}
+.inline-dot{display:inline-block;width:.65em;height:.65em;border-radius:50%;margin-right:.35em;vertical-align:baseline}
+img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--rule)}
+table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--ink2);font-weight:600}
+.scroll{overflow-x:auto}
+details summary{cursor:pointer;color:var(--ink2);margin:.4rem 0}
+a{color:var(--link)}
+footer{color:var(--muted);font-size:.82rem;margin:2rem 0 1rem}
+small{color:var(--ink2);font-size:.8rem}
+.nw{white-space:nowrap}
+.fig{display:block;margin:14px 0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+ol.passi{padding-left:1.3em} ol.passi li{margin:.55rem 0}
+.btn{display:inline-block;background:var(--link);color:var(--surface);text-decoration:none;font-weight:700;
+padding:12px 18px;border-radius:10px;margin:.4rem 0}
+.copy{display:flex;gap:8px;align-items:stretch;margin:.4rem 0 .2rem}
+.copy code{flex:1;min-width:0;overflow-wrap:anywhere;font-size:.82rem;background:var(--page);border:1px solid var(--rule);
+border-radius:8px;padding:8px}
+.copy button{flex:none;font:inherit;font-weight:600;border:1px solid var(--rule);border-radius:8px;background:var(--surface);
+color:var(--ink);padding:0 12px}
+.nota{color:var(--ink2);font-size:.9rem}
+</style></head>
+<body><main>
+<h1>Aggiungi il widget al telefono</h1>
+<p class="sub">Serve l'app <strong>KWGT</strong> (Play Store). Il widget è un'immagine che si aggiorna da sola
+ogni 30 minuti.</p>
+<img src="widget43.png?v=202611141541" width="1200" height="900" alt="Anteprima del widget: stato, pioggia ora per ora a Pratignano e Scaffaiolo, livelli di Leo e Panaro, pioggia prevista">
+
+<h2>Hai già il widget? Passa al formato 4×3</h2>
+<div class="card"><ol class="passi">
+<li>Sulla Home tieni premuto sul widget e trascina la maniglia in basso finché occupa <strong>3 righe</strong>.</li>
+<li>Tocca il widget per aprire KWGT → riga <strong>Immagine</strong> → tocca la riga <strong>Bitmap</strong>
+(è già una formula: si apre la casella di testo). Cancella tutto e incolla:
+<div class="copy"><code id="n1">$&quot;https://meme190891.github.io/fanano-meteo/widget43&quot; + if(si(darkmode) = 1, &quot;_dark&quot;, &quot;&quot;) + &quot;.png?t=&quot; + mu(floor, (df(S) - 900) / 1800)$</code><button type="button" onclick="copia('n1', this)">Copia</button></div></li>
+<li>Tocca la riga <strong>Larghezza</strong>, cancella tutto e incolla:
+<div class="copy"><code id="n2">$mu(min, si(rwidth), si(rheight) * 4 / 3)$</code><button type="button" onclick="copia('n2', this)">Copia</button></div></li>
+<li>Tocca il <strong>dischetto</strong> per salvare.</li>
+</ol>
+<p class="nota">Finché non fai questi passi il widget continua a mostrare la versione precedente, senza problemi.</p></div>
+<div class="card"><p><strong>Hai KWGT gratuito?</strong> Usa il metodo 1: creare un widget da zero è gratis.
+<br><strong>Hai KWGT PRO?</strong> Puoi usare il metodo 2, più veloce: importare un widget già pronto è una
+funzione della versione PRO.</p></div>
+
+<h2>Metodo 1 · a mano, gratis (6 passi)</h2>
+<div class="card"><ol class="passi">
+<li>Sulla schermata Home tieni premuto su uno spazio vuoto → <strong>Widget</strong> → <strong>KWGT</strong> →
+trascina sulla Home il widget <strong>4×3</strong>. Poi tocca il widget: si apre KWGT.
+Se propone dei widget pronti, scegli di crearne uno nuovo/vuoto.</li>
+<li>Tocca <strong>+</strong> in alto a destra e scegli <strong>Immagine</strong> (in inglese <em>Image</em>).</li>
+<li>Tocca la riga <strong>Immagine</strong> appena creata, poi la voce <strong>Bitmap</strong>.
+Tocca l'icona della <strong>calcolatrice</strong> (formula), cancella quello che c'è e incolla questo testo:
+<div class="copy"><code id="f1">$&quot;https://meme190891.github.io/fanano-meteo/widget43&quot; + if(si(darkmode) = 1, &quot;_dark&quot;, &quot;&quot;) + &quot;.png?t=&quot; + mu(floor, (df(S) - 900) / 1800)$</code><button type="button" onclick="copia('f1', this)">Copia</button></div></li>
+<li>Sempre nell'immagine, tocca <strong>Larghezza</strong> (<em>Width</em>) → icona della calcolatrice → incolla:
+<div class="copy"><code id="f2">$mu(min, si(rwidth), si(rheight) * 4 / 3)$</code><button type="button" onclick="copia('f2', this)">Copia</button></div></li>
+<li>Facoltativo, per aprire i grafici toccando il widget: scheda <strong>Touch</strong> → <strong>+</strong> →
+azione <em>Open link</em> (Apri link) → incolla:
+<div class="copy"><code id="f3">https://meme190891.github.io/fanano-meteo/index.html</code><button type="button" onclick="copia('f3', this)">Copia</button></div></li>
+<li>Tocca il <strong>dischetto</strong> in alto per salvare e torna alla Home.</li>
+</ol></div>
+
+<h2>Metodo 2 · con il file pronto (richiede KWGT PRO)</h2>
+<div class="card"><ol class="passi">
+<li><a class="btn" href="Fanano_meteo.kwgt" download>Scarica il widget</a><br>
+<span class="nota">Il file <code>Fanano_meteo.kwgt</code> finisce nella cartella <em>Download</em>.</span></li>
+<li>Aggiungi sulla Home un widget <strong>KWGT 4×3</strong> e toccalo (come al passo 1 del metodo 1).</li>
+<li>Tocca <strong>Load Preset</strong> (Carica preset) → icona della <strong>cartella</strong> in alto →
+<strong>Import</strong> → scegli <code>Fanano_meteo.kwgt</code> dalla cartella <em>Download</em>.</li>
+<li>Tocca l'icona del <strong>dischetto</strong> in alto per salvare. Fatto.</li>
+</ol>
+<p class="nota">Senza PRO, KWGT chiede di acquistarla: è normale, usa il metodo 1.</p></div>
+
+<h2>Se qualcosa non va</h2>
+<ul>
+<li><strong>Il widget resta vuoto:</strong> controlla la connessione e che il testo incollato sia identico (usa i
+pulsanti Copia).</li>
+<li><strong>Non si aggiorna:</strong> nelle impostazioni del telefono togli KWGT dall'ottimizzazione della batteria.</li>
+<li><strong>Il tocco non apre nulla</strong> (alcuni Xiaomi/OnePlus): impostazioni di KWGT → <em>Notification Mode</em> → <em>FORCED</em>.</li>
+</ul>
+<p><a href="index.html">← Torna ai grafici e ai valori</a></p>
+<footer>Dati Arpae in tempo reale, non validati. Fonte: Allerta Meteo Emilia-Romagna (Arpae), CC BY-NC-SA 4.0.</footer>
+</main>
+<script>
+function copia(id, btn) {
+  var t = document.getElementById(id).textContent;
+  var ok = function () { btn.textContent = "Copiato"; setTimeout(function () { btn.textContent = "Copia"; }, 2000); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(ok, function () { seleziona(id); });
+  } else { seleziona(id); }
+}
+function seleziona(id) {
+  var r = document.createRange(); r.selectNodeContents(document.getElementById(id));
+  var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+</script>
+</body></html>
