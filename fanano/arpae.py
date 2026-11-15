@@ -111,6 +111,12 @@ def url_previsione(cfg: dict) -> str:
             f"&p_p_state=normal&p_p_mode=view&_AllertaPrevisioniTerritorioPortlet_prov={prov}")
 
 
+def url_rest_pioggia(cfg: dict, stazione: str) -> str:
+    """API REST di arpae.it (fonte di riserva): ultimi ~15 giorni della stazione, un punto ogni 30'."""
+    base = cfg["arpae"]["rest_url"].rstrip("/")
+    return f'{base}/meteo_osservati/?where={{"_id":"{stazione}"}}&max_results=1'
+
+
 def endpoint_urls(cfg: dict, now: datetime | None = None) -> dict[str, str]:
     """Tutti gli URL di produzione, una chiave per endpoint (ognuno chiamato una volta per esecuzione)."""
     now = now or datetime.now(UTC)
@@ -197,6 +203,27 @@ def parse_serie(data: list) -> Serie:
             continue
         t = datetime.fromtimestamp(int(p["t"]) / 1000, tz=UTC)
         punti[t] = float(p["v"])
+    return sorted(punti.items())
+
+
+def parse_rest_pioggia(data: dict) -> Serie:
+    """Risposta REST meteo_osservati -> pioggia cumulata su 1h agli orari pieni (come il portale Allerta).
+
+    Le chiavi sono giorno "YYYYMMDD" e ora "HHMM" in UTC; ai :30 c'e' la cumulata mobile, che si scarta
+    per restare coerenti con la serie oraria del portale Allerta. Valori nulli esclusi.
+    """
+    punti: dict[datetime, float] = {}
+    for item in (data or {}).get("_items") or []:
+        for giorno, ore in (item.get("dati") or {}).items():
+            for hhmm, valori in (ore or {}).items():
+                v = (valori or {}).get("precipitazione_cumulata_1h")
+                if v is None or not hhmm.endswith("00"):
+                    continue
+                try:
+                    t = datetime.strptime(giorno + hhmm, "%Y%m%d%H%M").replace(tzinfo=UTC)
+                except ValueError:
+                    continue
+                punti[t] = float(v)
     return sorted(punti.items())
 
 

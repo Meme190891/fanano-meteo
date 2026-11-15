@@ -31,7 +31,8 @@ I file si aggiornano da soli ogni 30 minuti.
 ```
 GitHub Actions (ogni 30', minuti 8 e 38)
   ├─ legge state.json dall'ultima pubblicazione (storico, ultimi dati validi)
-  ├─ 8 richieste ad allertameteo.regione.emilia-romagna.it (una per endpoint)
+  ├─ 7 richieste ad allertameteo.regione.emilia-romagna.it (una per endpoint)
+  │    + 1 ad apps.arpae.it per ogni pluviometro senza dati recenti (riserva, di solito nessuna)
   ├─ python -m fanano.main: storico, cumulate, tendenze, soglie, stato, grafici
   └─ pubblica sul branch gh-pages (un solo commit sovrascritto) ──► GitHub Pages ──► KWGT
 ```
@@ -40,7 +41,8 @@ Nessun server sempre acceso, nessun database: lo stato è il file `state.json` p
 
 ## Fonti dei dati
 
-Tutto dal portale Allerta Meteo Emilia-Romagna (Arpae e Agenzia regionale di protezione civile).
+Tutto dal portale Allerta Meteo Emilia-Romagna (Arpae e Agenzia regionale di protezione civile),
+con una sola fonte di riserva per la pioggia (sotto).
 
 | Dato | Endpoint (`https://allertameteo.regione.emilia-romagna.it` + …) | Documentato? |
 |---|---|---|
@@ -49,6 +51,16 @@ Tutto dal portale Allerta Meteo Emilia-Romagna (Arpae e Agenzia regionale di pro
 | Serie pioggia oraria (~48–72 h) | `/o/api/allerta/get-time-series/?stazione=<id>&variabile=1,0,3600/1,-,-,-/B13011` | no |
 | Stato di allerta (oggi; domani con `?data=AAAA-MM-GG%2012:00`) | `/o/get-stato-allerta` | **sì**, [guida sviluppatori](https://allertameteo.regione.emilia-romagna.it/sviluppatori) |
 | Previsione ufficiale per provincia (testo + mm per giorno) | `/previsioni-regionali?p_p_id=AllertaPrevisioniTerritorioPortlet&…&_AllertaPrevisioniTerritorioPortlet_prov=MO` | no (pagina HTML) |
+
+**Riserva per la pioggia.** Se il portale non ha dati recenti (più vecchi di 2 ore) per un pluviometro, si
+interroga una volta l'API REST di arpae.it, la stessa del grafico "Grafici per stazione" di
+www.arpae.it: `https://apps.arpae.it/REST/meteo_osservati/?where={"_id":"<id>"}&max_results=1`
+(~15 giorni, un valore ogni 30'; si usano solo gli orari pieni, come nel portale). Sono le stesse misure:
+dove ci sono entrambe le fonti i valori coincidono al decimale. Serve perché a volte il portale pubblica come
+mancante un dato che la REST ha (es. Lago Scaffaiolo dal 13/11/2026). I valori del portale hanno sempre la
+precedenza; l'esito è in `state.json` alla voce `fonti.riserva_pioggia_<stazione>`. Licenza dei contenuti
+di arpae.it: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.it)
+([note legali](https://www.arpae.it/it/note-legali-e-copyright)), compatibile con quella sopra.
 
 - **robots.txt** del portale: `User-Agent: * / Disallow:`, cioè tutto consentito.
 - **Licenza**: contenuti e servizi web del portale sono [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)

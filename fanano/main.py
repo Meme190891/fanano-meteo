@@ -14,7 +14,7 @@ import json
 import os
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -47,6 +47,42 @@ def interpreta(nome: str, contenuto: bytes, cfg: dict, now: datetime):
     raise KeyError(nome)
 
 
+def _serve_riserva(ris, now: datetime, cfg: dict) -> bool:
+    """La pioggia del portale Allerta manca (errore, serie vuota) o l'ultimo valore e' vecchio."""
+    if isinstance(ris, Exception) or not ris:
+        return True
+    return now - ris[-1][0] > timedelta(hours=cfg["regole"]["dato_vecchio_ore"])
+
+
+def integra_riserva(raccolta: dict, cfg: dict, now: datetime, scarica) -> dict:
+    """Per ogni pluviometro senza dati recenti dal portale Allerta interroga l'API REST di arpae.it.
+
+    `scarica(nome, url) -> bytes` (rete o file salvato). I valori del portale Allerta, se presenti,
+    hanno la precedenza; quelli REST riempiono i buchi. L'esito resta in raccolta["riserva_<endpoint>"]
+    (serie usata o eccezione), cosi' compare tra le fonti di state.json e, se fallisce, negli errori.
+    """
+    if not cfg["arpae"].get("rest_url"):
+        return raccolta
+    for p in cfg["pluviometri"]:
+        nome = f"pioggia_{p['chiave']}"
+        ris = raccolta.get(nome)
+        if nome not in raccolta or not _serve_riserva(ris, now, cfg):
+            continue
+        try:
+            serie = arpae.parse_rest_pioggia(json.loads(scarica(f"riserva_{nome}", arpae.url_rest_pioggia(cfg, p["id"]))))
+            if not serie:
+                raise ValueError("serie vuota")
+        except (OSError, requests.RequestException, ValueError, KeyError, TypeError) as exc:
+            raccolta[f"riserva_{nome}"] = exc
+            continue
+        principale = [] if isinstance(ris, Exception) else ris
+        punti = dict(serie)
+        punti.update(dict(principale))
+        raccolta[nome] = sorted(punti.items())
+        raccolta[f"riserva_{nome}"] = serie
+    return raccolta
+
+
 def raccogli_online(cfg: dict, now: datetime) -> dict:
     """Una richiesta per endpoint; ogni fonte e' indipendente (un errore non blocca le altre)."""
     session = arpae.make_session(cfg)
@@ -58,7 +94,7 @@ def raccogli_online(cfg: dict, now: datetime) -> dict:
             raccolta[nome] = interpreta(nome, resp.content, cfg, now)
         except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
             raccolta[nome] = exc
-    return raccolta
+    return integra_riserva(raccolta, cfg, now, lambda _nome, url: arpae.fetch(session, url, timeout=timeout).content)
 
 
 def raccogli_da_cartella(cartella: Path, cfg: dict, now: datetime) -> dict:
@@ -70,7 +106,7 @@ def raccogli_da_cartella(cartella: Path, cfg: dict, now: datetime) -> dict:
             raccolta[nome] = interpreta(nome, f.read_bytes(), cfg, now)
         except (OSError, ValueError, KeyError, TypeError) as exc:
             raccolta[nome] = exc
-    return raccolta
+    return integra_riserva(raccolta, cfg, now, lambda nome, _url: (cartella / f"{nome}.json").read_bytes())
 
 
 def leggi_stato(path: Path) -> dict | None:

@@ -6,6 +6,11 @@ arpae:
   base_url: "https://allertameteo.regione.emilia-romagna.it"
   user_agent: "fanano-meteo-widget/0.1 (+https://github.com/Meme190891/fanano-meteo)"
   timeout_s: 20
+  # Fonte di riserva per la pioggia: API REST del sito arpae.it (la stessa del grafico
+  # "grafici per stazione"). Stesse misure del portale Allerta, ma a volte il portale le pubblica
+  # come mancanti (es. Scaffaiolo dal 13/11/2026). Si interroga solo per un pluviometro senza
+  # dati recenti dal portale Allerta. Licenza CC BY 4.0 (www.arpae.it/it/note-legali-e-copyright).
+  rest_url: "https://apps.arpae.it/REST"
 
 # Codici variabile Arpae (formato: timerange/livello/codice BUFR)
 variabili:

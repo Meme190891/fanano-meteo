@@ -8,6 +8,7 @@ arpae:
   base_url: "https://allertameteo.regione.emilia-romagna.it"
   user_agent: "fanano-meteo-widget/0.1 (+https://github.com/Meme190891/fanano-meteo)"
   timeout_s: 20
+  rest_url: "https://apps.arpae.it/REST"
 
 # Codici variabile Arpae (formato: timerange/livello/codice BUFR)
 variabili:
