@@ -408,6 +408,8 @@ Regola tarata su un anno di dati (circa +0,6 cm di livello per mm di pioggia).
 <footer>{_e(pub['disclaimer'])}. Fonte: <a href="{base_arpae}/">Allerta Meteo Emilia-Romagna</a>
 (Arpae Emilia-Romagna e Agenzia per la sicurezza territoriale e la protezione civile),
 licenza <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.
+Pioggia mancante sul portale integrata, se serve, dai dati di <a href="https://www.arpae.it/">Arpae Emilia-Romagna</a>
+(<a href="https://creativecommons.org/licenses/by/4.0/deed.it">CC BY 4.0</a>).
 Elaborazione non ufficiale per uso personale: per decisioni di sicurezza fare riferimento ai canali ufficiali.</footer>
 </main></body></html>
 """
