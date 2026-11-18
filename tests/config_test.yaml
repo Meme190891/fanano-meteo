@@ -53,6 +53,17 @@ pluviometri:
     sigla: "Scaff."          # usata nelle righe compatte del widget
     id: "12461"
 
+# Notifiche Telegram (vedi README, "Notifiche"). Il bot si collega con due segreti del repository GitHub:
+# TELEGRAM_TOKEN e TELEGRAM_CHAT_ID (mai in questo file). Senza segreti non parte nessuna notifica.
+notifiche:
+  attive: true
+  leo_salita_m: 0.10        # avviso se il Leo sale di almeno 10 cm rispetto a 3 ore prima (tendenza_ore)
+  leo_fine_salita_m: 0.02   # fine: salita sulle 3 ore scesa a 2 cm o meno
+  pioggia_oraria_mm: 5      # avviso se in un'ora cadono almeno 5 mm a Pratignano o Scaffaiolo
+  pioggia_fine_ore: 3       # fine: 3 ore di fila senza ore oltre soglia
+  allerta_eventi: []        # eventi di allerta considerati; vuoto = tutti (idraulica, neve, vento, ...)
+  guasto_ore: 3             # avviso se nessun dato osservato nuovo da 3 ore
+
 # Regole di calcolo (vedi README, sezione "Regole")
 regole:
   storico_ore: 96                 # ore di serie conservate in state.json

@@ -19,7 +19,7 @@ from pathlib import Path
 
 import requests
 
-from fanano import arpae, compute
+from fanano import arpae, compute, notifiche
 from fanano.config import load_config
 
 UTC = timezone.utc
@@ -127,8 +127,10 @@ def scrivi_json(path: Path, obj) -> None:
     os.replace(tmp, path)
 
 
-def esegui(cfg: dict, out: Path, stato_path: Path, raccolta: dict, now: datetime, grafici: bool = True) -> dict:
+def esegui(cfg: dict, out: Path, stato_path: Path, raccolta: dict, now: datetime, grafici: bool = True,
+           invia=None, prova_notifica: bool = False) -> dict:
     stato, errori = compute.aggiorna_stato(leggi_stato(stato_path), raccolta, now, cfg)
+    errori += notifiche.gestisci(stato, cfg, now, invia, prova_notifica)
     widget = compute.costruisci_widget(stato, cfg, now, errori)
     if grafici:
         try:
@@ -150,6 +152,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--config", type=Path, help="config.yaml alternativo")
     ap.add_argument("--senza-grafici", action="store_true", help="non generare PNG e index.html")
     ap.add_argument("--base-url", help="URL base Arpae alternativo (es. host inesistente per provare il fallback)")
+    ap.add_argument("--prova-notifica", action="store_true",
+                    help="invia anche un messaggio di prova su Telegram (servono TELEGRAM_TOKEN e TELEGRAM_CHAT_ID)")
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config) if args.config else load_config()
@@ -161,7 +165,8 @@ def main(argv: list[str] | None = None) -> int:
     raccolta = (raccogli_da_cartella(args.da_cartella, cfg, now) if args.da_cartella
                 else raccogli_online(cfg, now))
     widget = esegui(cfg, args.out, args.stato or args.out / "state.json", raccolta, now,
-                    grafici=not args.senza_grafici)
+                    grafici=not args.senza_grafici, invia=notifiche.mittente_da_ambiente(),
+                    prova_notifica=args.prova_notifica)
     print(json.dumps(widget, ensure_ascii=False, indent=1))
     if widget["errori"]:
         print(f"\nFonti fallite (mantenuto l'ultimo dato valido): {widget['errori']}", file=sys.stderr)

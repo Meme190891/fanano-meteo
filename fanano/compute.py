@@ -226,7 +226,7 @@ def fmt_range_m(basso: float, alto: float) -> str:
 
 def stato_vuoto() -> dict:
     return {"versione": VERSIONE_STATO, "aggiornato": None, "serie": {}, "idrometri": {},
-            "allerte": {}, "previsione": None, "fonti": {}}
+            "allerte": {}, "previsione": None, "fonti": {}, "notifiche": None}
 
 
 def aggiorna_stato(stato: dict | None, raccolta: dict, now: datetime, cfg: dict) -> tuple[dict, list[str]]:

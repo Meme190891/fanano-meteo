@@ -34,6 +34,7 @@ GitHub Actions (ogni 30', minuti 8 e 38)
   ├─ 7 richieste ad allertameteo.regione.emilia-romagna.it (una per endpoint)
   │    + 1 ad apps.arpae.it per ogni pluviometro senza dati recenti (riserva, di solito nessuna)
   ├─ python -m fanano.main: storico, cumulate, tendenze, soglie, stato, grafici
+  ├─ notifiche Telegram sugli eventi prestabiliti (se il bot è collegato)
   └─ pubblica sul branch gh-pages (un solo commit sovrascritto) ──► GitHub Pages ──► KWGT
 ```
 
@@ -343,6 +344,38 @@ Il preset pronto (`Fanano_meteo.kwgt`, metodo 1) contiene la versione a immagine
 c'è un preset: una volta costruito il widget, conviene esportarlo dal menu dell'editor di KWGT come copia di
 sicurezza.
 
+## Notifiche Telegram
+
+Il sistema può mandare un messaggio Telegram quando succede uno di questi eventi (soglie in
+`config.yaml`, sezione `notifiche`). Per ogni evento arriva un messaggio all'inizio e uno alla fine.
+
+| Evento | Inizio | Fine |
+|---|---|---|
+| Leo in crescita | sale di almeno 10 cm rispetto a 3 ore prima (con il livello attuale) | la salita sulle 3 ore scende a 2 cm o meno (con il massimo raggiunto) |
+| Pioggia forte | in un'ora cadono almeno 5 mm a Pratignano o Scaffaiolo (ogni colonna dei grafici è un'ora) | 3 ore di fila sotto soglia (con il totale caduto) |
+| Allerta zona E1 | allerta gialla, arancione o rossa oggi o domani, per qualsiasi evento; un nuovo avviso se il colore cambia | oggi e domani tornano verdi |
+| Dati fermi | nessun dato Arpae nuovo da 3 ore | i dati tornano |
+
+Con i dati fermi nessun evento viene dichiarato finito. Sui due anni di taratura le soglie danno circa
+40–50 salite del Leo e 25–45 episodi di pioggia forte all'anno. Le notifiche arrivano con lo stesso
+ritardo dei dati (da 45 minuti a circa un'ora e mezza): sono un promemoria, non un sistema di allarme.
+Se GitHub smette del tutto di eseguire il workflow non arriva nessun messaggio, nemmeno "dati fermi".
+
+**Collegare il bot (una volta sola)**
+
+1. In Telegram apri **@BotFather**, scrivi `/newbot`, scegli un nome e un nome utente che finisca con `bot`.
+   BotFather risponde con un **token** (es. `123456789:AA...`): è una password, non condividerlo.
+2. Apri il tuo nuovo bot e premi **Avvia** (o scrivigli un messaggio qualsiasi): senza questo passo il bot
+   non può scriverti.
+3. Trova il tuo **id**: apri **@userinfobot**, premi **Avvia**, e copia il numero dopo `Id`.
+4. Su GitHub, nel repository: **Settings → Secrets and variables → Actions → New repository secret**.
+   Crea due segreti: `TELEGRAM_TOKEN` con il token del punto 1 e `TELEGRAM_CHAT_ID` con l'id del punto 3.
+5. **Actions → aggiorna → Run workflow**, spunta **Invia un messaggio di prova** e avvia.
+   In un paio di minuti arrivano il messaggio di prova e il riepilogo della situazione.
+
+Il token resta solo nei segreti di GitHub: non è nel codice, non compare nei log e non finisce su Pages.
+Per sospendere le notifiche: `attive: false` in `config.yaml`, oppure cancella i due segreti.
+
 ## Limiti
 
 **Dati**
@@ -410,6 +443,7 @@ fanano/render.py              grafici PNG, index.html e kwgt.html (istruzioni pe
 fanano/widget_img.py          il widget intero come immagine (widget.png / widget_dark.png)
 fanano/kwgt.py                preset KWGT importabile (Fanano_meteo.kwgt)
 fanano/main.py                esecuzione completa (online o da cartella di risposte salvate)
+fanano/notifiche.py           notifiche Telegram: eventi, inizio/fine, invio
 fanano/probe.py               diagnostica di raggiungibilità
 calibrazione/                 dati storici Dext3r e script di taratura della stima "Leo previsto"
 tests/                        test (parsing, calcoli, fallback, grafici, config) + fixture Arpae reali
