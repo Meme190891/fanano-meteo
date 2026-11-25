@@ -29,7 +29,7 @@ I file si aggiornano da soli ogni 30 minuti.
 ## Come funziona
 
 ```
-GitHub Actions (ogni 30', minuti 8 e 38)
+GitHub Actions (ogni 30': cron-job.org ai minuti 3 e 33, riserva GitHub ai minuti 8 e 38)
   ├─ legge state.json dall'ultima pubblicazione (storico, ultimi dati validi)
   ├─ 7 richieste ad allertameteo.regione.emilia-romagna.it (una per endpoint)
   │    + 1 ad apps.arpae.it per ogni pluviometro senza dati recenti (riserva, di solito nessuna)
@@ -375,6 +375,37 @@ Se GitHub smette del tutto di eseguire il workflow non arriva nessun messaggio, 
 
 Il token resta solo nei segreti di GitHub: non è nel codice, non compare nei log e non finisce su Pages.
 Per sospendere le notifiche: `attive: false` in `config.yaml`, oppure cancella i due segreti.
+
+## Sveglia esterna (cron-job.org)
+
+L'orario automatico di GitHub (`schedule`) non è garantito: nei periodi di carico salta esecuzioni,
+anche per molte ore (es. 25/11/2026: 9 ore senza aggiornamenti). Per questo un servizio gratuito esterno,
+[cron-job.org](https://cron-job.org), avvia il workflow ogni 30 minuti con una chiamata all'API di GitHub
+(`workflow_dispatch`). L'orario di GitHub resta come riserva.
+
+Due sveglie possono partire a pochi minuti di distanza: il workflow salta l'esecuzione se l'ultimo
+aggiornamento ha meno di 20 minuti (salvo `forza`, `prova_notifica` o `simula_arpae_giu`), così Arpae non
+viene interrogata più di una volta ogni 30 minuti circa.
+
+Configurazione (una volta sola):
+
+1. **Chiave GitHub** – <https://github.com/settings/personal-access-tokens/new> (fine-grained token):
+   nome `cron-job fanano-meteo`; scadenza la più lunga disponibile; *Repository access* →
+   **Only select repositories** → `fanano-meteo`; *Permissions* → *Repository permissions* →
+   **Actions: Read and write** (nient'altro). La chiave può solo avviare e leggere i workflow di questo
+   repository. Va copiata subito: GitHub non la mostra più.
+2. **cron-job.org** – account gratuito, poi *Create cronjob*:
+   - URL: `https://api.github.com/repos/Meme190891/fanano-meteo/actions/workflows/aggiorna.yml/dispatches`
+   - Execution schedule: ogni 30 minuti (*Custom*, minuti `3,33`, tutte le ore e tutti i giorni)
+   - Advanced → Request method: **POST**
+   - Advanced → Headers: `Authorization` = `Bearer <chiave>`, `Accept` = `application/vnd.github+json`,
+     `X-GitHub-Api-Version` = `2022-11-28`
+   - Advanced → Request body: `{"ref":"main"}`
+   - Risposta attesa: **204** (nessun contenuto). 401 = chiave sbagliata o scaduta; 403/404 = permessi.
+3. Alla scadenza della chiave GitHub manda un'email: si crea una chiave nuova e si sostituisce
+   nell'header `Authorization` su cron-job.org.
+
+La chiave non è nel repository: vive solo su cron-job.org.
 
 ## Limiti
 

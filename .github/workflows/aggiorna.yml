@@ -12,6 +12,10 @@ on:
         description: "Prova il fallback: usa un host Arpae inesistente (i dati restano quelli dell'ultima esecuzione)"
         type: boolean
         default: false
+      forza:
+        description: "Aggiorna anche se l'ultimo aggiornamento ha meno di 20 minuti"
+        type: boolean
+        default: false
       prova_notifica:
         description: "Invia un messaggio di prova su Telegram (servono i segreti TELEGRAM_TOKEN e TELEGRAM_CHAT_ID)"
         type: boolean
@@ -46,7 +50,30 @@ jobs:
           fi
           ls -la public
 
+      # Due "sveglie" (orario di GitHub e cron-job.org): se l'ultimo aggiornamento ha meno di 20 minuti
+      # si salta, cosi' Arpae non viene interrogata piu' di una volta ogni 30 minuti circa.
+      - name: Salta se aggiornato da poco
+        id: recente
+        env:
+          FORZA: ${{ inputs.forza || inputs.prova_notifica || inputs.simula_arpae_giu || false }}
+        run: |
+          python - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json, os, pathlib
+          from datetime import datetime, timezone
+          salta = False
+          if os.environ["FORZA"] != "true":
+              try:
+                  t = datetime.fromisoformat(json.loads(pathlib.Path("public/state.json").read_text())["aggiornato"])
+                  eta = (datetime.now(timezone.utc) - t).total_seconds() / 60
+                  salta = eta < 20
+                  print(f"ultimo aggiornamento {eta:.0f} minuti fa", file=__import__("sys").stderr)
+              except (OSError, ValueError, KeyError, TypeError):
+                  pass
+          print(f"salta={'true' if salta else 'false'}")
+          EOF
+
       - name: Genera widget.json, grafici e pagina
+        if: steps.recente.outputs.salta != 'true'
         env:
           SIMULA: ${{ inputs.simula_arpae_giu && '--base-url https://arpae-non-raggiungibile.invalid' || '' }}
           PROVA: ${{ inputs.prova_notifica && '--prova-notifica' || '' }}
@@ -55,6 +82,7 @@ jobs:
         run: python -m fanano.main --out public $SIMULA $PROVA > /dev/null
 
       - name: Controlla l'output prima di pubblicare
+        if: steps.recente.outputs.salta != 'true'
         run: |
           python - <<'EOF'
           import json, pathlib
@@ -71,6 +99,7 @@ jobs:
           touch public/.nojekyll
 
       - name: Pubblica su gh-pages (commit orfano singolo)
+        if: steps.recente.outputs.salta != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
