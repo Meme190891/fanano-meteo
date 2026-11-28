@@ -1,0 +1,21 @@
+Licenza dei dati pubblicati (widget.json, state.json, *.png, index.html)
+
+I dati provengono dal portale Allerta Meteo Emilia-Romagna
+(https://allertameteo.regione.emilia-romagna.it/), gestito da Arpae Emilia-Romagna -
+Servizio Idro-Meteo-Clima e dall'Agenzia per la sicurezza territoriale e la protezione
+civile - Emilia-Romagna, e sono rilasciati con licenza Creative Commons
+Attribuzione - Non commerciale - Condividi allo stesso modo 4.0 Internazionale
+(CC BY-NC-SA 4.0): https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+I file pubblicati sono una rielaborazione automatica di quei dati (cumulate, tendenze,
+confronto con le soglie, grafici) e sono distribuiti con la stessa licenza CC BY-NC-SA 4.0.
+Fonte: "Allerta Meteo Emilia-Romagna" - https://allertameteo.regione.emilia-romagna.it/
+
+Quando il portale non ha dati recenti di un pluviometro, la pioggia oraria viene integrata con l'API
+REST di Arpae Emilia-Romagna (https://www.arpae.it/ - https://apps.arpae.it/REST/meteo_osservati),
+licenza Creative Commons Attribuzione 4.0 Internazionale (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/deed.it - fonte: "Arpae Emilia-Romagna", dati rielaborati
+(solo valori agli orari pieni, uniti alla serie del portale).
+
+Dati in tempo reale, non validati. Elaborazione non ufficiale per uso personale:
+per decisioni di sicurezza fare riferimento ai canali ufficiali.
